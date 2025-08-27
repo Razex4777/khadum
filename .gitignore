@@ -25,10 +25,11 @@ dist-ssr
 
 .vercel
 
-# MCP Configuration with sensitive tokens
+# Environment and Configuration Files
+.env
+.env.local
+.env.*.local
 .kiro/settings/mcp.json
 
-# Environment files with secrets
-.env.local
-.env.production
+# Sensitive configuration files
 whatsapp-bot/.env

@@ -1,0 +1,78 @@
+---
+description: UI design system and styling guidelines
+---
+
+# UI Design System & Styling Guidelines
+
+## 🎨 Color Palette
+Based on Saudi cultural inspiration with modern design:
+- **Primary**: Green shades (brand color)
+- **Secondary**: White and gold accents
+- **Theme**: Uses CSS custom properties from shadcn/ui
+- **Configuration**: [tailwind.config.ts](mdc:tailwind.config.ts) lines 24-67
+
+## ✨ Design Language
+### Saudi-Inspired Modern Design
+- Clean, minimalist interface
+- Cultural color harmony (green, white, gold)
+- Professional and trustworthy appearance
+- Accessibility-first approach
+
+### Custom Styling Classes
+Based on [src/components/landing/Hero.tsx](mdc:src/components/landing/Hero.tsx):
+- `neon-text` - Glowing text effect for headings
+- `neon-ring` - Glowing border effect for cards
+- `hover-glow` - Interactive hover animations
+- Custom button variants: `variant="glow"`, `variant="hero"`
+
+## 🧩 Component Design Patterns
+### Card Components
+```tsx
+<Card className="neon-ring hover-glow bg-card/80">
+  <CardContent className="p-4">
+    {/* Content */}
+  </CardContent>
+</Card>
+```
+
+### Button Variations
+- `variant="glow"` - Primary action buttons with glow effect
+- `variant="hero"` - Secondary hero buttons
+- Use semantic button text based on language context
+
+### Layout Patterns
+- **Responsive Grid**: `grid md:grid-cols-2 gap-10`
+- **Container**: `container py-16 md:py-28` for consistent spacing
+- **Cards Grid**: `grid grid-cols-3 gap-4` for statistics/features
+
+## 🎯 Animation & Interactions
+### Custom Animations (Tailwind Config)
+- `fade-in/fade-out` - Page transitions
+- `scale-in/scale-out` - Modal/popup animations  
+- `slide-in-right/slide-out-right` - Drawer animations
+- `accordion-down/accordion-up` - Accordion animations
+
+### Interactive Elements
+- Smooth hover transitions
+- Glow effects on focus/hover
+- Subtle scale animations for cards
+- Professional loading states
+
+## 📱 Responsive Design
+- **Mobile-first** approach
+- **Breakpoints**: Follow Tailwind defaults (sm, md, lg, xl, 2xl)
+- **Container**: Max-width 1400px (`2xl` breakpoint)
+- **Spacing**: Consistent padding and margins using Tailwind scale
+
+## 🔤 Typography Scale
+- **Font Family**: Tajawal (Arabic-optimized)
+- **Headings**: `text-4xl md:text-5xl font-extrabold` for hero titles
+- **Body**: `text-lg` for readability
+- **Captions**: `text-sm text-muted-foreground`
+
+## 🎪 Future Dashboard Design
+When building admin dashboard components:
+- Maintain the same design language
+- Use sidebar navigation pattern (already configured in Tailwind)
+- Implement data visualization with charts (recharts dependency available)
+- Follow the same card-based layout for dashboard widgets

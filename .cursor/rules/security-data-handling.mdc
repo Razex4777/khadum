@@ -1,0 +1,96 @@
+---
+description: Security and data handling requirements for Khadum platform
+---
+
+# Security & Data Handling Guidelines
+
+## 🔒 Security Requirements Overview
+Based on [khadum_plan.txt](mdc:khadum_plan.txt) security specifications:
+
+### Data Encryption Standards
+- **Sensitive Data**: AES-256 encryption for bank accounts, personal info
+- **Communications**: End-to-End Encryption (E2EE) for WhatsApp messages
+- **Storage**: Encrypted storage for all PII (Personally Identifiable Information)
+
+### Authentication & Authorization
+- **OTP Verification**: WhatsApp-based OTP for login/verification
+- **Access Levels**: System admin, freelancer, client role-based access
+- **Session Management**: Secure session handling with proper timeouts
+
+## 🚫 Content Filtering & Compliance
+### Anti-Violation Measures
+- **Text Analysis**: Prevent sharing of external contact info (phone numbers, external links)
+- **Communication Monitoring**: All messages through bot only (no direct contact)
+- **Automated Alerts**: System admin notifications for policy violations
+
+### Data Privacy Rules
+```tsx
+// Example: Encrypted data handling
+const encryptSensitiveData = (data: string) => {
+  // AES-256 encryption implementation
+  // Never log or expose sensitive data
+};
+
+const handleBankAccount = (iban: string) => {
+  // Always encrypt before storage
+  const encrypted = encryptSensitiveData(iban);
+  // Store encrypted version only
+};
+```
+
+## 🔐 Implementation Guidelines
+### Frontend Security Practices
+- **No Sensitive Data**: Never store encryption keys or sensitive data in frontend
+- **API Security**: Use HTTPS only, implement proper CORS
+- **Input Validation**: Validate all user inputs, sanitize data
+- **Error Handling**: Don't expose system details in error messages
+
+### WhatsApp Integration Security
+- **API Key Management**: Secure WhatsApp Business API key handling
+- **Message Encryption**: Implement E2EE for all communications
+- **Rate Limiting**: Prevent spam and abuse
+- **Audit Logs**: Track all interactions for security monitoring
+
+## 💳 Payment Security (Future Implementation)
+### Payment Gateway Integration
+- **PCI Compliance**: Follow PCI DSS standards for payment data
+- **Gateway Options**: PayTabs, Mada integration with Saudi regulations
+- **No Storage**: Never store complete payment card data
+- **Secure Links**: Generate secure, time-limited payment links
+
+### Financial Data Handling
+```tsx
+// Example: Secure payment processing
+interface PaymentRequest {
+  amount: number;
+  currency: 'SAR';
+  clientId: string;
+  freelancerId: string;
+  // Never include sensitive payment details
+}
+```
+
+## 🛡️ Development Security Checklist
+- [ ] All sensitive data properly encrypted
+- [ ] No hardcoded secrets or API keys
+- [ ] Proper input validation and sanitization
+- [ ] HTTPS enforced for all communications
+- [ ] Error messages don't expose system details
+- [ ] Audit logging for all critical operations
+- [ ] Rate limiting implemented
+- [ ] CORS properly configured
+- [ ] Content Security Policy (CSP) headers
+- [ ] Regular security testing and updates
+
+## 📋 Compliance Requirements
+### Saudi Arabia Regulations
+- **Data Localization**: Consider Saudi data residency requirements
+- **Financial Regulations**: Comply with SAMA (Saudi Central Bank) guidelines
+- **Privacy Laws**: Align with Saudi Personal Data Protection Law
+- **Business Registration**: Ensure proper commercial registration compliance
+
+## 🚨 Incident Response
+- **Data Breach**: Immediate containment and notification procedures
+- **Security Monitoring**: Real-time monitoring for suspicious activities
+- **Backup & Recovery**: Secure backup strategies for critical data
+- **Regular Audits**: Periodic security assessments and penetration testing

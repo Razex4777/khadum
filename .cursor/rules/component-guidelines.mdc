@@ -1,0 +1,63 @@
+---
+globs: *.tsx,*.ts
+---
+
+# Component Development Guidelines
+
+## 🧩 Component Structure
+Follow the pattern established in [src/components/landing/Hero.tsx](mdc:src/components/landing/Hero.tsx):
+
+```tsx
+// 1. Imports (UI components first, then utils)
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { useEffect, useState } from "react";
+
+// 2. Interface definition
+interface ComponentProps { 
+  lang: 'ar' | 'en'; 
+}
+
+// 3. Component implementation
+const ComponentName = ({ lang }: ComponentProps) => {
+  // 4. Bilingual content object
+  const t = {
+    ar: { /* Arabic content */ },
+    en: { /* English content */ }
+  }[lang];
+
+  // 5. Component logic and JSX
+  return (
+    <section>
+      {/* Component content */}
+    </section>
+  );
+};
+
+export default ComponentName;
+```
+
+## 🌐 Bilingual Support Requirements
+**MANDATORY**: All components must support both Arabic and English
+- Accept `lang: 'ar' | 'en'` prop
+- Use the `t` object pattern for translations
+- Ensure proper RTL layout for Arabic
+- Test both language variants
+
+## 🎨 UI Component Usage
+- **Always use shadcn/ui components** from [src/components/ui/](mdc:src/components/ui/)
+- Import utilities from [src/lib/utils.ts](mdc:src/lib/utils.ts) for className merging
+- Follow the established design tokens in [tailwind.config.ts](mdc:tailwind.config.ts)
+- Use semantic HTML elements for accessibility
+
+## 📦 Export Pattern
+- Use default exports for components
+- Name components in PascalCase
+- File names should match component names
+
+## 🏗️ Future Dashboard Components
+When building admin dashboard components:
+- Place in `src/components/dashboard/` directory
+- Follow the same bilingual pattern
+- Integrate with the security requirements from the project plan
+- Support the planned features: freelancer management, client management, project tracking, payment processing

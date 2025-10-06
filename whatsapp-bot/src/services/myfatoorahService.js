@@ -10,23 +10,18 @@ import { logger } from '../utils/logger.js';
 
 class MyFatoorahService {
   constructor() {
-    // Configuration from environment variables
+    // Live Saudi Arabia API configuration only
     this.apiKey = process.env.MYFATOORAH_API_KEY;
-    this.baseUrl = process.env.MYFATOORAH_BASE_URL || 'https://api-sa.myfatoorah.com';
-    this.testMode = process.env.MYFATOORAH_TEST_MODE === 'true';
+    this.baseUrl = 'https://api-sa.myfatoorah.com';
+    this.currency = 'SAR';
 
-    // Test environment credentials (from documentation)
-    this.testApiKey = "rLtt6JWvbUHDDhsZnfpAhpYk4dxYDQkbcPTyGaKp2TYqQgG7FGZ5Th_WD53Oq8Ebz6A53njUoo1w3pjU1D4vs_ZMqFiz_j0urb_BH9Oq9VZoKFoJEDAbRZepGcQanImyYrry7Kt6MnMdgfG5jn4HngWoRdKduNNyP4kzcp3mRv7x00ahkm9LAK7ZRieg7k1PDAnBIOG3EyVSJ5kK4WLMvYr7sCwHbHcu4A5WwelxYK0GMJy37bNAarSJDFQsJ2ZvJjvMDmfWwDVFEVe_5tOomfVNt6bOg9mexbGjMrnHBnKnZR1vQbBtQieDlQepzTZMuQrSuKn-t5XZM7V6fCW7oP-uXGX-sMOajeX65JOf6XVpk29DP6ro8WTAflCDANC193yof8-f5_EYY-3hXhJj7RBXmizDpneEQDSaSz5sFk0sV5qPcARJ9zGG73vuGFyenjPPmtDtXtpx35A-BVcOSBYVIWe9kndG3nclfefjKEuZ3m4jL9Gg1h2JBvmXSMYiZtp9MR5I6pvbvylU_PP5xJFSjVTIz7IQSjcVGO41npnwIxRXNRxFOdIUHn0tjQ-7LwvEcTXyPsHXcMD8WtgBh-wxR8aKX7WPSsT1O8d8reb2aR7K3rkV3K82K_0OgawImEpwSvp9MNKynEAJQS6ZHe_J_l77652xwPNxMRTMASk1ZsJL";
-    this.testBaseUrl = 'https://apitest.myfatoorah.com';
+    if (!this.apiKey) {
+      throw new Error('MYFATOORAH_API_KEY is required for live mode');
+    }
 
-    // Use test environment if live is not working
-    this.currentApiKey = this.testMode ? this.testApiKey : this.apiKey;
-    this.currentBaseUrl = this.testMode ? this.testBaseUrl : this.baseUrl;
-    this.currentCurrency = this.testMode ? 'KWD' : 'SAR';
-
-    console.log(`MyFatoorah Service initialized: ${this.testMode ? 'TEST' : 'LIVE'} mode`);
-    console.log(`Base URL: ${this.currentBaseUrl}`);
-    console.log(`Currency: ${this.currentCurrency}`);
+    console.log('MyFatoorah Service initialized: LIVE mode only');
+    console.log(`Base URL: ${this.baseUrl}`);
+    console.log(`Currency: ${this.currency}`);
   }
 
   /**
@@ -35,7 +30,7 @@ class MyFatoorahService {
   getConfig() {
     return {
       headers: {
-        'Authorization': `Bearer ${this.currentApiKey}`,
+        'Authorization': `Bearer ${this.apiKey}`,
         'Content-Type': 'application/json',
         'Accept': 'application/json'
       },
@@ -61,12 +56,15 @@ class MyFatoorahService {
 
       // Try real MyFatoorah API first with correct endpoint
       try {
+        // Clean phone number for MyFatoorah (remove country code, max 11 chars)
+        const cleanPhone = clientPhone.replace(/[^\d]/g, '').slice(-11); // Take last 11 digits
+        
         const payload = {
           CustomerName: clientName,
-          NotificationOption: "ALL", // Email + SMS + Link
+          NotificationOption: "Lnk", // Link only for better compatibility
           InvoiceValue: amount,
-          DisplayCurrencyIso: this.currentCurrency,
-          CustomerMobile: clientPhone,
+          DisplayCurrencyIso: this.currency,
+          CustomerMobile: cleanPhone,
           CustomerEmail: `${clientPhone.replace(/[^\d]/g, '')}@temp.khadum.com`,
           CallBackUrl: `${process.env.WEBHOOK_BASE_URL || 'https://khadum.com'}/webhook/myfatoorah/callback`,
           ErrorUrl: `${process.env.WEBHOOK_BASE_URL || 'https://khadum.com'}/webhook/myfatoorah/error`,
@@ -88,12 +86,12 @@ class MyFatoorahService {
           ]
         };
 
-        console.log('📤 Sending request to MyFatoorah API...');
-        console.log(`URL: ${this.currentBaseUrl}/v2/SendPayment`);
+        console.log('📤 Sending request to MyFatoorah LIVE API...');
+        console.log(`URL: ${this.baseUrl}/v2/SendPayment`);
         console.log('Payload:', JSON.stringify(payload, null, 2));
 
         const response = await axios.post(
-          `${this.currentBaseUrl}/v2/SendPayment`,
+          `${this.baseUrl}/v2/SendPayment`,
           payload,
           this.getConfig()
         );
@@ -101,7 +99,7 @@ class MyFatoorahService {
         if (response.data.IsSuccess) {
           const paymentData = response.data.Data;
 
-          logger.info('✅ Real MyFatoorah payment link generated successfully', {
+          logger.info('✅ LIVE MyFatoorah payment link generated successfully', {
             invoiceId: paymentData.InvoiceId,
             paymentUrl: paymentData.InvoiceURL,
             clientPhone
@@ -112,7 +110,7 @@ class MyFatoorahService {
             invoiceId: paymentData.InvoiceId,
             paymentUrl: paymentData.InvoiceURL,
             invoiceReference: paymentData.CustomerReference,
-            expiryDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+            expiryDate: new Date(Date.now() + 12 * 60 * 60 * 1000).toISOString(),
             isReal: true
           };
         } else {
@@ -120,52 +118,20 @@ class MyFatoorahService {
         }
 
       } catch (realApiError) {
-        logger.warn('⚠️ Real MyFatoorah API failed, using mock payment system', {
+        logger.error('❌ MyFatoorah LIVE API failed:', {
           error: realApiError.message,
           status: realApiError.response?.status,
           data: realApiError.response?.data
         });
 
-        // Fallback to mock payment system
-        return this.generateMockPaymentLink(paymentData);
+        // Return error instead of fallback
+        throw new Error(`MyFatoorah API Error: ${realApiError.response?.data?.Message || realApiError.message}`);
       }
 
     } catch (error) {
       logger.error('❌ Failed to generate payment link:', error);
-
-      // Final fallback to mock system
-      return this.generateMockPaymentLink(paymentData);
+      throw error; // Propagate error instead of fallback
     }
-  }
-
-  /**
-   * Generate mock payment link for testing/fallback
-   * @param {Object} paymentData - Payment information
-   * @returns {Object} Mock payment link data
-   */
-  async generateMockPaymentLink(paymentData) {
-    const { clientPhone, clientName, freelancerData, amount = 300 } = paymentData;
-
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    const mockInvoiceId = Math.floor(Math.random() * 1000000) + 2000000;
-    const mockReference = `KHADUM_MOCK_${Date.now()}`;
-
-    logger.info('✅ Mock payment link generated', {
-      invoiceId: mockInvoiceId,
-      clientPhone,
-      freelancerName: freelancerData.full_name
-    });
-
-    return {
-      success: true,
-      invoiceId: mockInvoiceId,
-      paymentUrl: `https://demo.myfatoorah.com/KWT/ie/01072606292741-${mockInvoiceId}`,
-      invoiceReference: mockReference,
-      expiryDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-      isReal: false
-    };
   }
 
   /**
@@ -178,7 +144,7 @@ class MyFatoorahService {
       logger.debug('🔍 Verifying MyFatoorah payment', { invoiceId });
 
       const response = await axios.get(
-        `${this.currentBaseUrl}/v2/GetPaymentStatus`,
+        `${this.baseUrl}/v2/GetPaymentStatus`,
         {
           ...this.getConfig(),
           params: {
@@ -314,11 +280,11 @@ class MyFatoorahService {
 
       const payload = {
         InvoiceAmount: amount,
-        CurrencyIso: this.currentCurrency
+        CurrencyIso: this.currency
       };
 
       const response = await axios.post(
-        `${this.currentBaseUrl}/v2/InitiatePayment`,
+        `${this.baseUrl}/v2/InitiatePayment`,
         payload,
         this.getConfig()
       );
@@ -361,37 +327,13 @@ class MyFatoorahService {
   }
 
   /**
-   * Switch to test mode
-   */
-  switchToTestMode() {
-    console.log('🔄 Switching to TEST mode');
-    this.testMode = true;
-    this.currentApiKey = this.testApiKey;
-    this.currentBaseUrl = this.testBaseUrl;
-    this.currentCurrency = 'KWD';
-  }
-
-  /**
-   * Switch to live mode
-   */
-  switchToLiveMode() {
-    console.log('🔄 Switching to LIVE mode');
-    this.testMode = false;
-    this.currentApiKey = this.apiKey;
-    this.currentBaseUrl = this.baseUrl;
-    this.currentCurrency = 'SAR';
-  }
-
-  /**
    * Format payment link message for WhatsApp
    * @param {Object} paymentLinkData - Payment link information
    * @param {Object} freelancerData - Freelancer information
    * @returns {string} Formatted WhatsApp message
    */
   formatPaymentMessage(paymentLinkData, freelancerData) {
-    const isReal = paymentLinkData.isReal !== false; // Default to true if not specified
-
-    const baseMessage = `🎉 تم اختيار المستقل بنجاح!
+    return `🎉 تم اختيار المستقل بنجاح!
 
 👤 المستقل المختار: ${freelancerData.full_name}
 ⭐ التقييم: ${freelancerData.average_rating}/5
@@ -399,27 +341,8 @@ class MyFatoorahService {
 
 💰 قيمة الخدمة: ${config.myfatoorah.defaultAmount} ريال سعودي
 
-🔗 رابط الدفع${isReal ? ' الآمن' : ' التجريبي'}:
-${paymentLinkData.paymentUrl}`;
-
-    if (!isReal) {
-      return baseMessage + `
-
-⚠️ ملاحظة مهمة:
-• هذا رابط تجريبي للاختبار
-• في البيئة الحقيقية سيتم استخدام MyFatoorah API
-• جميع الوظائف تعمل بشكل طبيعي
-
-📋 تعليمات:
-• لا تغير اسم المستخدم في الواتساب
-• لا تغير رقم الهاتف
-• هذا ضروري للتحقق من الدفع
-
-⏰ صالح حتى: ${new Date(paymentLinkData.expiryDate).toLocaleString('ar-SA')}
-
-بعد الدفع سيتم إشعارك تلقائياً 🚀`;
-    } else {
-      return baseMessage + `
+🔗 رابط الدفع الآمن:
+${paymentLinkData.paymentUrl}
 
 ⚠️ تنبيه مهم:
 • لا تغير اسم المستخدم في الواتساب
@@ -429,7 +352,6 @@ ${paymentLinkData.paymentUrl}`;
 ⏰ صالح حتى: ${new Date(paymentLinkData.expiryDate).toLocaleString('ar-SA')}
 
 بعد الدفع سيتم إشعارك تلقائياً ✅`;
-    }
   }
 
   /**

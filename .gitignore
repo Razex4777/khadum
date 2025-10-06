@@ -33,3 +33,4 @@ dist-ssr
 
 # Sensitive configuration files
 whatsapp-bot/.env
+whatsapp

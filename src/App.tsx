@@ -14,6 +14,8 @@ import DashboardLayout from "./pages/dashboard/DashboardLayout";
 import DashboardHome from "./pages/dashboard/DashboardHome";
 import Profile from "./pages/dashboard/Profile";
 import Projects from "./pages/dashboard/Projects";
+import Conversations from "./pages/dashboard/Conversations";
+import NotificationsPage from "./pages/dashboard/NotificationsPage";
 import AuthGuard from "./components/AuthGuard";
 
 const queryClient = new QueryClient();
@@ -45,6 +47,8 @@ const App = () => (
             <Route index element={<DashboardHome />} />
             <Route path="profile" element={<Profile />} />
             <Route path="projects" element={<Projects />} />
+            <Route path="conversations" element={<Conversations />} />
+            <Route path="notifications" element={<NotificationsPage />} />
           </Route>
           
           <Route path="/admin-login" element={<AdminLogin />} />

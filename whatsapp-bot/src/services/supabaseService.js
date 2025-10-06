@@ -652,6 +652,180 @@ class SupabaseService {
   }
 
   /**
+   * Set user payment state
+   * @param {string} userId - WhatsApp user ID
+   * @param {string} state - Payment state ('awaiting_payment', 'normal', etc.)
+   * @param {Object} paymentData - Payment-related data
+   * @returns {Boolean} Success status
+   */
+  async setUserPaymentState(userId, state, paymentData = null) {
+    try {
+      const updateData = {
+        payment_state: state,
+        payment_state_updated_at: new Date().toISOString()
+      };
+
+      if (paymentData) {
+        updateData.pending_payment_data = paymentData;
+      }
+
+      const { error } = await this.supabase
+        .from(this.tableName)
+        .upsert({
+          whatsapp_phone: userId,
+          user_id: userId,
+          ...updateData
+        }, {
+          onConflict: 'whatsapp_phone'
+        });
+
+      if (error) {
+        logger.error('❌ Error setting user payment state:', error);
+        throw error;
+      }
+
+      logger.debug('✅ User payment state updated', { userId, state });
+      return true;
+    } catch (error) {
+      logger.error('❌ Failed to set user payment state:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Get user payment state
+   * @param {string} userId - WhatsApp user ID
+   * @returns {Object} User payment state data
+   */
+  async getUserPaymentState(userId) {
+    try {
+      const { data, error } = await this.supabase
+        .from(this.tableName)
+        .select('payment_state, payment_state_updated_at, pending_payment_data')
+        .eq('whatsapp_phone', userId)
+        .single();
+
+      if (error && error.code !== 'PGRST116') { // PGRST116 = not found
+        logger.error('❌ Error getting user payment state:', error);
+        throw error;
+      }
+
+      return {
+        state: data?.payment_state || 'normal',
+        updatedAt: data?.payment_state_updated_at,
+        paymentData: data?.pending_payment_data
+      };
+    } catch (error) {
+      logger.error('❌ Failed to get user payment state:', error);
+      return { state: 'normal', updatedAt: null, paymentData: null };
+    }
+  }
+
+  /**
+   * Clear user payment state
+   * @param {string} userId - WhatsApp user ID
+   * @returns {Boolean} Success status
+   */
+  async clearUserPaymentState(userId) {
+    try {
+      const { error } = await this.supabase
+        .from(this.tableName)
+        .update({
+          payment_state: 'normal',
+          payment_state_updated_at: new Date().toISOString(),
+          pending_payment_data: null
+        })
+        .eq('whatsapp_phone', userId);
+
+      if (error) {
+        logger.error('❌ Error clearing user payment state:', error);
+        throw error;
+      }
+
+      logger.debug('✅ User payment state cleared', { userId });
+      return true;
+    } catch (error) {
+      logger.error('❌ Failed to clear user payment state:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Get all users with expired payments
+   * @returns {Array} Users with expired payments
+   */
+  async getExpiredPayments() {
+    try {
+      const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString();
+      
+      const { data, error } = await this.supabase
+        .from(this.tableName)
+        .select('whatsapp_phone, whatsapp_username, payment_state_updated_at, pending_payment_data')
+        .eq('payment_state', 'awaiting_payment')
+        .lt('payment_state_updated_at', twelveHoursAgo);
+
+      if (error) {
+        logger.error('❌ Error getting expired payments:', error);
+        throw error;
+      }
+
+      logger.debug(`🔍 Found ${data?.length || 0} expired payments`);
+      return data || [];
+    } catch (error) {
+      logger.error('❌ Failed to get expired payments:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Delete specific message from conversation history
+   * @param {string} userId - WhatsApp user ID
+   * @param {string} messageContent - Content of message to delete
+   * @returns {Boolean} Success status
+   */
+  async deleteMessageFromHistory(userId, messageContent) {
+    try {
+      const { data, error: fetchError } = await this.supabase
+        .from(this.tableName)
+        .select('conversation')
+        .eq('whatsapp_phone', userId)
+        .single();
+
+      if (fetchError && fetchError.code !== 'PGRST116') {
+        logger.error('❌ Error fetching conversation for deletion:', fetchError);
+        throw fetchError;
+      }
+
+      if (!data?.conversation) {
+        logger.warn('⚠️ No conversation found for user:', userId);
+        return false;
+      }
+
+      // Filter out the message containing payment link
+      const updatedConversation = data.conversation.filter(msg => 
+        !msg.content.includes(messageContent) && 
+        !msg.content.includes('🔗 رابط الدفع')
+      );
+
+      const { error: updateError } = await this.supabase
+        .from(this.tableName)
+        .update({ conversation: updatedConversation })
+        .eq('whatsapp_phone', userId);
+
+      if (updateError) {
+        logger.error('❌ Error deleting message from history:', updateError);
+        throw updateError;
+      }
+
+      logger.debug('✅ Message deleted from conversation history', { userId });
+      return true;
+    } catch (error) {
+      logger.error('❌ Failed to delete message from history:', error);
+      return false;
+    }
+  }
+
+  /**
    * Create payment record for client
    * @param {Object} paymentData - Payment information
    * @returns {Object} Created payment record
@@ -797,6 +971,66 @@ class SupabaseService {
     } catch (error) {
       logger.error('❌ Failed to get payment by invoice ID:', error);
       return null;
+    }
+  }
+
+  /**
+   * Add paid user record for development testing
+   * @param {Object} userData - User payment data
+   * @returns {Object} Created payment record
+   */
+  async addPaidUser(userData) {
+    try {
+      const {
+        phone_number,
+        whatsapp_name,
+        freelancer_id,
+        freelancer_name,
+        payment_amount,
+        invoice_id,
+        payment_method,
+        transaction_id
+      } = userData;
+
+      logger.debug('💾 Adding paid user record', { phone_number, freelancer_name, payment_amount });
+
+      const { data, error } = await this.supabase
+        .from('paid_users')
+        .insert({
+          client_id: phone_number,
+          client_name: whatsapp_name,
+          paid_to_freelancers: [{
+            id: freelancer_id,
+            full_name: freelancer_name
+          }],
+          payment_amount: payment_amount,
+          currency: 'SAR',
+          myfatoorah_payment_id: invoice_id,
+          payment_status: 'completed',
+          payment_method: payment_method,
+          transaction_id: transaction_id,
+          paid_at: new Date().toISOString(),
+          created_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (error) {
+        logger.error('❌ Error adding paid user:', error);
+        throw error;
+      }
+
+      logger.info('✅ Paid user record created successfully', {
+        recordId: data.id,
+        clientPhone: phone_number,
+        freelancerName: freelancer_name,
+        amount: payment_amount
+      });
+
+      return data;
+    } catch (error) {
+      logger.error('❌ Failed to add paid user:', error);
+      throw error;
     }
   }
 

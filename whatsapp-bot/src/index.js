@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import { webhookRouter } from './routes/webhook.js';
 import { healthRouter } from './routes/health.js';
 import { myfatoorahRouter } from './routes/myfatoorah.js';
+import { paymentExpirationService } from './services/paymentExpirationService.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { logger } from './utils/logger.js';
 
@@ -48,6 +49,14 @@ app.listen(PORT, () => {
   logger.info(`🚀 Server is running on port ${PORT}`);
   logger.info(`🤖 WhatsApp Gemini Chatbot is ready!`);
   logger.info(`📍 Webhook URL: http://localhost:${PORT}/webhook`);
+  
+  // Start payment expiration service
+  try {
+    paymentExpirationService.start();
+    logger.info('💳 Payment expiration service started successfully');
+  } catch (error) {
+    logger.error('❌ Failed to start payment expiration service:', error);
+  }
 });
 
 export default app;

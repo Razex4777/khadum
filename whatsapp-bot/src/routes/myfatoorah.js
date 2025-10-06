@@ -2,6 +2,7 @@ import express from 'express';
 import { myfatoorahService } from '../services/myfatoorahService.js';
 import { supabaseService } from '../services/supabaseService.js';
 import { whatsappService } from '../services/whatsappService.js';
+import { paymentExpirationService } from '../services/paymentExpirationService.js';
 import { logger } from '../utils/logger.js';
 
 const router = express.Router();
@@ -25,6 +26,9 @@ router.post('/callback', async (req, res) => {
       );
 
       if (paymentRecord) {
+        // Clear user payment state first - allow bot to respond again
+        await supabaseService.clearUserPaymentState(paymentRecord.client_id);
+
         // Send success message to client via WhatsApp
         const successMessage = myfatoorahService.formatSuccessMessage({
           paidAmount: webhookResult.paidAmount,
@@ -118,6 +122,9 @@ router.post('/verify/:invoiceId', async (req, res) => {
       const paymentRecord = await supabaseService.updatePaymentStatus(invoiceId, verification);
 
       if (paymentRecord) {
+        // Clear user payment state - allow bot to respond again
+        await supabaseService.clearUserPaymentState(paymentRecord.client_id);
+
         // Send success message to client
         const successMessage = myfatoorahService.formatSuccessMessage({
           paidAmount: verification.paidAmount,
@@ -148,6 +155,51 @@ router.post('/verify/:invoiceId', async (req, res) => {
 
   } catch (error) {
     logger.error('❌ Error in manual payment verification:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+});
+
+/**
+ * Manual payment expiration check endpoint
+ * For testing and manual cleanup
+ */
+router.post('/check-expired', async (req, res) => {
+  try {
+    logger.info('🔧 Manual payment expiration check requested');
+    
+    await paymentExpirationService.manualCheck();
+    
+    res.status(200).json({
+      success: true,
+      message: 'Expired payments check completed'
+    });
+    
+  } catch (error) {
+    logger.error('❌ Error in manual expiration check:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+});
+
+/**
+ * Get payment expiration service status
+ */
+router.get('/expiration-status', (req, res) => {
+  try {
+    const status = paymentExpirationService.getStatus();
+    
+    res.status(200).json({
+      success: true,
+      ...status
+    });
+    
+  } catch (error) {
+    logger.error('❌ Error getting expiration service status:', error);
     res.status(500).json({
       success: false,
       message: 'Internal server error'

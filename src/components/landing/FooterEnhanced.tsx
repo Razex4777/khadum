@@ -211,7 +211,7 @@ const FooterEnhanced = () => {
         <div className="border-t border-white/10 py-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="text-sm text-white/80 text-center md:text-right">
-              © {new Date().getFullYear()} خدوم (Khadoom) - جميع الحقوق محفوظة
+              © 2025 SALMAN ABDUH ALI ALASMARI — Sales Promotion and Management. All Rights Reserved.
             </div>
             
             {/* Trust Badges */}

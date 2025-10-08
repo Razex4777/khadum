@@ -1,12 +1,32 @@
 import { whatsappService } from '../services/whatsappService.js';
-import { geminiService } from '../services/geminiService.js';
-import { supabaseService } from '../services/supabaseService.js';
+import { geminiService } from '../services/geminiservice/index.js';
+import { supabaseService } from '../services/supabaseservice/index.js';
 import { myfatoorahService } from '../services/myfatoorahService.js';
 import { logger } from '../utils/logger.js';
+import { InputSanitizer } from '../utils/inputSanitizer.js';
+import { MockPaymentUtil } from '../utils/mockPaymentUtil.js';
+import { config } from '../config/config.js';
+import { bridgeModeService } from '../services/bridgeModeService.js';
+import { CommandRegistry } from '../commands/index.js';
 
 class MessageProcessor {
   constructor() {
     this.processingMessages = new Set(); // Prevent duplicate processing
+    
+    // Initialize services
+    const services = {
+      supabaseService,
+      whatsappService,
+      geminiService,
+      bridgeModeService,
+      myfatoorahService
+    };
+    
+    // Initialize command registry in geminiService
+    geminiService.initializeCommandRegistry(services);
+    
+    // Use the command registry from geminiService
+    this.commandRegistry = geminiService.commandRegistry;
   }
 
   /**
@@ -33,7 +53,7 @@ class MessageProcessor {
       // Send typing indicator
       await whatsappService.sendTypingIndicator(from);
 
-      // Check payment state FIRST - block ALL messages during payment process
+      // Check payment state FIRST - block ALL messages during payment process (except slash commands)
       const paymentState = await supabaseService.getUserPaymentState(from);
       
       logger.info(`💳 Payment state check for ${from}:`, {
@@ -42,23 +62,49 @@ class MessageProcessor {
         hasPaymentData: !!paymentState.paymentData
       });
       
-      if (paymentState.state === 'awaiting_payment') {
+      // Allow slash commands to bypass payment blocking
+      const isSlashCommand = text.startsWith('/');
+      
+      if (paymentState.state === 'awaiting_payment' && !isSlashCommand) {
         logger.info('💳 User has pending payment - BLOCKING AI response and sending fixed message', { from });
         await this.sendPaymentPendingMessage(from);
         return; // Stop processing - don't handle any other message types
       }
       
-      logger.info('🚀 No pending payment - proceeding with normal message processing', { from });
+      logger.info('🚀 No pending payment or slash command - proceeding with normal message processing', { from });
+
+      // Check if user is in bridge mode FIRST - bypass ALL other processing
+      const bridgeSession = await bridgeModeService.getActiveBridgeSession(from);
+      if (bridgeSession) {
+        logger.info('🌉 User is in bridge mode - forwarding message directly', { 
+          from, 
+          targetPhone: bridgeSession.target_phone 
+        });
+        
+        // Forward message through bridge and exit
+        const handled = await bridgeModeService.handleBridgeMessage(from, text, name);
+        if (handled) {
+          logger.debug('🌉 Message successfully forwarded in bridge mode', { from });
+          return; // Message forwarded, stop all processing
+        } else {
+          // HARD BLOCK: Do NOT fall back to AI while bridge mode is active
+          logger.warn('⚠️ Failed to forward bridge message - hard blocking AI while in bridge mode', { from });
+          await whatsappService.sendMessage(from, 
+            '⚠️ تعذر إرسال رسالتك عبر وضع الجسر.\n+\nسبب شائع: رقم المستلم غير مسموح به في إعدادات واتساب (Recipient list).\n\nلا يمكنني الرد بالذكاء الاصطناعي أثناء تفعيل وضع الجسر.\n\nرجاءً أضف رقم المستلم لقائمة المستلمين المسموح بهم ثم أعد الإرسال، أو اكتب /end_bridge_mode لإيقاف وضع الجسر.'
+          );
+          return; // Stop further processing entirely
+        }
+      }
 
       // Handle button responses first
       if (buttonId) {
         await this.handleButtonResponse(from, buttonId, text, name);
       } else {
         // Check for commands
-        const command = geminiService.parseCommand(text);
+        const command = this.commandRegistry.parseCommand(text);
         
         if (command) {
-          await this.handleCommand(from, command);
+          await this.handleCommand(from, command, text, name);
         } else {
           await this.handleAIResponse(from, text, name);
         }
@@ -122,33 +168,32 @@ class MessageProcessor {
    * Handle command messages
    * @param {string} from - User phone number
    * @param {Object} command - Command details
+   * @param {string} message - Full message text (for commands that need parameters)
+   * @param {string} name - User's WhatsApp name
    */
-  async handleCommand(from, command) {
+  async handleCommand(from, command, message, name) {
     try {
-      switch (command.command) {
-        case 'clear':
-          await supabaseService.clearConversationHistory(from);
-          await whatsappService.sendMessage(from, '🗑️ تم مسح محفوظات المحادثة بنجاح!\n🗑️ Conversation history cleared successfully!');
-          break;
+      // Execute command using CommandRegistry
+      const result = await this.commandRegistry.executeCommand(
+        command.command,
+        from,
+        message,
+        name
+      );
 
-        case 'help':
-          await whatsappService.sendMessage(from, geminiService.getHelpMessage());
-          break;
-
-        case 'info':
-          const messageCount = await supabaseService.getMessageCount(from);
-          const infoMessage = geminiService.getInfoMessage() + `\n\n📊 Your message count: ${messageCount}`;
-          await whatsappService.sendMessage(from, infoMessage);
-          break;
-
-        default:
-          await whatsappService.sendMessage(from, '❓ Unknown command. Send /help for available commands.');
+      if (!result.success) {
+        logger.warn(`Command execution failed: ${command.command}`, {
+          from,
+          error: result.error
+        });
       }
     } catch (error) {
       logger.error('Error handling command:', error);
       await this.sendErrorMessage(from);
     }
   }
+
+
 
   /**
    * Handle AI-powered responses with ALL available data context
@@ -160,15 +205,10 @@ class MessageProcessor {
     try {
       logger.debug('🤖 Starting AI response generation', { from, message, name });
 
-      // Development testing: simulate payment completion when "salman47" is sent
-      if (message.toLowerCase().trim() === 'salman47') {
-        await this.handleDevelopmentPaymentTest(from, name);
-        return;
-      }
-
-      // Check for "accept" keyword to trigger payment flow
-      if (message.toLowerCase().trim() === 'accept') {
-        await this.handleAcceptPayment(from, name);
+      // Check for special commands that aren't traditional slash commands
+      const specialCommand = this.commandRegistry.parseCommand(message);
+      if (specialCommand) {
+        await this.handleCommand(from, specialCommand, message, name);
         return;
       }
 
@@ -191,10 +231,13 @@ class MessageProcessor {
         totalRecords: allData.freelancers.length + allData.profiles.length + allData.projects.length
       });
 
+      // Sanitize user message before sending to AI
+      const sanitizedMessage = InputSanitizer.sanitizeForAI(message);
+      
       // Generate AI response with complete data context
       logger.debug('🧠 Generating AI response with complete data context');
       const aiResponse = await geminiService.generateResponseWithAllData(
-        message,
+        sanitizedMessage,
         history,
         allData,
         name
@@ -218,7 +261,7 @@ class MessageProcessor {
             { id: 'reject_freelancer', title: '❌ رفض والبحث عن آخر' }
           ],
           null,
-          'اختر أحد الخيارات أدناه 👇'
+          'اختر其中一个 الخيارات أدناه 👇'
         );
         
         logger.info(`🎉 AI response with buttons sent to ${from}`);
@@ -297,6 +340,19 @@ class MessageProcessor {
         return;
       }
 
+      // Ensure the freelancer object has the required fields
+      const freelancerData = {
+        id: recommendedFreelancer.id,
+        full_name: recommendedFreelancer.full_name || 'مستقل',
+        whatsapp_number: recommendedFreelancer.whatsapp_number || recommendedFreelancer.phone || null,
+        field: recommendedFreelancer.field || 'غير محدد',
+        average_rating: recommendedFreelancer.average_rating || 0,
+        total_projects: recommendedFreelancer.total_projects || 0,
+        completed_projects: recommendedFreelancer.completed_projects || 0,
+        is_verified: recommendedFreelancer.is_verified || false,
+        email: recommendedFreelancer.email || null
+      };
+
       let paymentLinkData;
       let paymentMessage;
 
@@ -305,12 +361,12 @@ class MessageProcessor {
         paymentLinkData = await myfatoorahService.generatePaymentLink({
           clientPhone: from,
           clientName: name,
-          freelancerData: recommendedFreelancer,
+          freelancerData: freelancerData,
           amount: 300
         });
 
         if (paymentLinkData.success) {
-          paymentMessage = myfatoorahService.formatPaymentMessage(paymentLinkData, recommendedFreelancer);
+          paymentMessage = myfatoorahService.formatPaymentMessage(paymentLinkData, freelancerData);
           logger.info('✅ Real MyFatoorah payment link generated', { invoiceId: paymentLinkData.invoiceId });
         } else {
           throw new Error('Real MyFatoorah failed');
@@ -323,56 +379,30 @@ class MessageProcessor {
         paymentLinkData = await this.generateMockPaymentLink({
           clientPhone: from,
           clientName: name,
-          freelancerData: recommendedFreelancer,
+          freelancerData: freelancerData,
           amount: 300
         });
 
-        paymentMessage = this.formatMockPaymentMessage(paymentLinkData, recommendedFreelancer);
+        paymentMessage = this.formatMockPaymentMessage(paymentLinkData, freelancerData);
         logger.info('✅ Mock payment link generated', { invoiceId: paymentLinkData.invoiceId });
-      }
-
-      // Create client-freelancer notification BEFORE payment
-      try {
-        await this.createFreelancerNotification({
-          freelancerId: recommendedFreelancer.id,
-          clientPhone: from,
-          clientName: name,
-          projectContext: projectContext,
-          paymentAmount: 300,
-          invoiceId: paymentLinkData.invoiceId
-        });
-        logger.info('✅ Freelancer notification created successfully');
-      } catch (notificationError) {
-        logger.error('❌ Failed to create freelancer notification:', notificationError);
-        // Continue with payment flow even if notification fails
-      }
-
-      // Save payment record to database (if method exists)
-      try {
-        if (typeof supabaseService.createPaymentRecord === 'function') {
-          await supabaseService.createPaymentRecord({
-            clientPhone: from,
-            clientName: name,
-            freelancerData: recommendedFreelancer,
-            paymentLink: paymentLinkData.paymentUrl,
-            invoiceId: paymentLinkData.invoiceId
-          });
-        }
-      } catch (dbError) {
-        logger.warn('⚠️ Failed to save payment record to database', { error: dbError.message });
       }
 
       // Send payment message
       await whatsappService.sendMessage(from, paymentMessage);
 
-      // Save payment message to history
-      await supabaseService.saveMessage(from, 'assistant', paymentMessage, name);
+      // Save payment message to history with metadata
+      await supabaseService.saveMessage(from, 'assistant', paymentMessage, name, {
+        type: 'payment',
+        isPayment: true,
+        invoiceId: paymentLinkData.invoiceId,
+        paymentUrl: paymentLinkData.paymentUrl
+      });
 
       // Set user state to awaiting payment
       await supabaseService.setUserPaymentState(from, 'awaiting_payment', {
         invoiceId: paymentLinkData.invoiceId,
         paymentUrl: paymentLinkData.paymentUrl,
-        freelancerData: recommendedFreelancer,
+        freelancerData: freelancerData,
         expiryDate: paymentLinkData.expiryDate,
         messageContent: paymentMessage
       });
@@ -380,7 +410,7 @@ class MessageProcessor {
       logger.info('✅ Payment link sent successfully', { 
         from, 
         invoiceId: paymentLinkData.invoiceId,
-        freelancer: recommendedFreelancer.full_name,
+        freelancer: freelancerData.full_name,
         userState: 'awaiting_payment'
       });
 
@@ -405,11 +435,11 @@ class MessageProcessor {
       const paymentState = await supabaseService.getUserPaymentState(from);
       
       if (paymentState.state !== 'awaiting_payment') {
-        // No pending payment - first create a mock payment, then complete it
-        await this.createMockPaymentAndComplete(from, name);
+        // No pending payment - create and complete mock payment
+        await this.handleMockPaymentFlow(from, name);
       } else {
         // User has pending payment - just complete it
-        await this.completeMockPayment(from, name, paymentState.paymentData);
+        await this.handleMockPaymentCompletion(from, name, paymentState.paymentData);
       }
 
     } catch (error) {
@@ -425,40 +455,51 @@ class MessageProcessor {
    * @param {string} from - User phone number
    * @param {string} name - User's WhatsApp name
    */
-  async createMockPaymentAndComplete(from, name) {
-    logger.info('🧪 Creating mock payment and completing immediately', { from });
+  async handleMockPaymentFlow(from, name) {
+    try {
+      // Get a random freelancer from database for testing
+      const freelancers = await supabaseService.supabase
+        .from('freelancers')
+        .select('*')
+        .limit(1)
+        .single();
 
-    // Sample freelancer data for testing
-    const sampleFreelancer = {
-      id: 'd0f55e6f-9cb7-49ca-b6c6-718c4ea698e3',
-      full_name: 'فاطمة علي السعد',
-      field: 'تطوير المواقع الإلكترونية', 
-      average_rating: 4.9
-    };
+      // Check for query failure first
+      if (freelancers.error) {
+        logger.error('❌ Database query failed:', freelancers.error);
+        throw new Error(`Database query failed: ${freelancers.error.message || freelancers.error.details || 'Unknown error'}`);
+      }
 
-    // Generate mock payment data
-    const mockInvoiceId = Math.floor(Math.random() * 1000000) + 2000000;
-    const mockPaymentData = {
-      invoiceId: mockInvoiceId,
-      paymentUrl: `https://portal.myfatoorah.com/ar/KSA/PayInvoice/${mockInvoiceId}/TEST`,
-      freelancerData: sampleFreelancer,
-      expiryDate: new Date(Date.now() + 12 * 60 * 60 * 1000).toISOString(),
-      messageContent: 'Mock payment for development testing'
-    };
+      // Then check for empty result
+      if (!freelancers.data) {
+        throw new Error('No freelancers found in database');
+      }
 
-    // Set payment state first
-    await supabaseService.setUserPaymentState(from, 'awaiting_payment', mockPaymentData);
-    logger.info('✅ Mock payment state set', { invoiceId: mockInvoiceId });
+      const freelancerData = freelancers.data;
+      logger.info('✅ Using freelancer from database for mock payment', {
+        freelancerId: freelancerData.id,
+        freelancerName: freelancerData.full_name
+      });
 
-    // Wait a moment then complete the payment
-    setTimeout(async () => {
-      await this.completeMockPayment(from, name, mockPaymentData);
-    }, 1000);
+      // Check if mock payments are enabled (environment guard)
+      if (!MockPaymentUtil.isEnabled()) {
+        logger.warn('🚫 Mock payments disabled - not allowed in production');
+        await whatsappService.sendMessage(from,
+          '🧪 اختبار الدفع غير متاح\n❌ Mock payment testing is disabled'
+        );
+        return;
+      }
 
-    // Send initial message about payment creation and completion
-    await whatsappService.sendMessage(from, 
-      `🧪 اختبار تطويري - دفع وهمي\n✅ تم إنشاء وإكمال الدفع تلقائياً\n📋 رقم الفاتورة: ${mockInvoiceId}\n⚡ جاري معالجة البيانات...`
-    );
+      // Use mock payment utility
+      const dependencies = { supabaseService, whatsappService, bridgeModeService }; // Add bridgeModeService
+      const params = { clientPhone: from, clientName: name, freelancerData };
+
+      await MockPaymentUtil.createAndCompleteMockPayment(dependencies, params);
+      
+    } catch (error) {
+      logger.error('❌ Error in mock payment flow:', error);
+      throw error;
+    }
   }
 
   /**
@@ -467,51 +508,15 @@ class MessageProcessor {
    * @param {string} name - User's WhatsApp name
    * @param {Object} paymentData - Payment data to complete
    */
-  async completeMockPayment(from, name, paymentData) {
+  async handleMockPaymentCompletion(from, name, paymentData) {
     try {
-      logger.info('🧪 Completing mock payment', { from, invoiceId: paymentData?.invoiceId });
-
-      const freelancerData = paymentData?.freelancerData || {
-        id: 'd0f55e6f-9cb7-49ca-b6c6-718c4ea698e3',
-        full_name: 'فاطمة علي السعد',
-        field: 'تطوير المواقع الإلكترونية',
-        average_rating: 4.9
-      };
-
-      // 1. Add user to paid_users table
-      await supabaseService.addPaidUser({
-        phone_number: from,
-        whatsapp_name: name,
-        freelancer_id: freelancerData.id,
-        freelancer_name: freelancerData.full_name,
-        payment_amount: 300,
-        invoice_id: paymentData?.invoiceId || `MOCK_${Date.now()}`,
-        payment_method: 'mock_test',
-        transaction_id: `TXN_MOCK_${Date.now()}`
-      });
-      logger.info('✅ Added user to paid_users table', { from });
-
-      // 2. Reset payment state to normal
-      await supabaseService.setUserPaymentState(from, 'normal', null);
-      logger.info('✅ Reset payment state to normal', { from });
-
-      // 3. Send success message
-      const successMessage = `🎉 تم الدفع بنجاح! (اختبار تطويري)\n\n✅ تم إضافتك لقاعدة البيانات\n👤 المستقل: ${freelancerData.full_name}\n💰 المبلغ: 300 ريال\n📋 رقم الفاتورة: ${paymentData?.invoiceId}\n\n🤖 يمكنك الآن التحدث معي بشكل طبيعي!`;
+      const dependencies = { supabaseService, whatsappService, bridgeModeService }; // Add bridgeModeService
+      const params = { clientPhone: from, clientName: name, paymentData };
       
-      await whatsappService.sendMessage(from, successMessage);
-
-      // 4. Save success message to conversation history
-      await supabaseService.saveMessage(from, 'assistant', successMessage, name);
-
-      logger.info('🎉 Mock payment completed successfully!', {
-        from,
-        freelancer: freelancerData.full_name,
-        invoiceId: paymentData?.invoiceId,
-        userState: 'normal'
-      });
-
+      await MockPaymentUtil.completeMockPayment(dependencies, params);
+      
     } catch (error) {
-      logger.error('❌ Error completing mock payment:', error);
+      logger.error('❌ Error in mock payment completion:', error);
       throw error;
     }
   }
@@ -522,20 +527,7 @@ class MessageProcessor {
    * @returns {Object} Mock payment link data
    */
   async generateMockPaymentLink(paymentData) {
-    const { clientPhone, clientName, freelancerData, amount = 300 } = paymentData;
-    
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    const mockInvoiceId = Math.floor(Math.random() * 1000000) + 2000000;
-    
-    return {
-      success: true,
-      invoiceId: mockInvoiceId,
-      paymentUrl: `https://portal.myfatoorah.com/ar/KSA/PayInvoice/${mockInvoiceId}/${process.env.MYFATOORAH_API_KEY}`,
-      invoiceReference: `KHADUM_MOCK_${Date.now()}`,
-      expiryDate: new Date(Date.now() + 12 * 60 * 60 * 1000).toISOString()
-    };
+    return await MockPaymentUtil.generateMockPaymentLink(paymentData);
   }
 
   /**
@@ -545,6 +537,13 @@ class MessageProcessor {
    * @returns {string} Formatted payment message
    */
   formatMockPaymentMessage(paymentLinkData, freelancerData) {
+    return MockPaymentUtil.formatMockPaymentMessage(paymentLinkData, freelancerData);
+  }
+
+  /**
+   * Legacy method for compatibility - delegates to utility
+   */
+  formatMockPaymentMessageLegacy(paymentLinkData, freelancerData) {
     return `🎉 تم اختيار المستقل بنجاح!
 
 👤 المستقل المختار: ${freelancerData.full_name}
@@ -555,9 +554,6 @@ class MessageProcessor {
 
 🔗 رابط الدفع:
 ${paymentLinkData.paymentUrl}
-
-⚠️ ملاحظة: هذا رابط تجريبي للاختبار
-✅ في البيئة الحقيقية سيتم استخدام MyFatoorah API
 
 ⏰ صالح حتى: ${new Date(paymentLinkData.expiryDate).toLocaleString('ar-SA')}
 
@@ -619,10 +615,11 @@ ${paymentLinkData.paymentUrl}
         .map(msg => msg.content)
         .join(' ');
 
+      // Sanitize user messages before sending to AI
+      const sanitizedUserMessages = InputSanitizer.sanitizeForAI(userMessages);
+      
       // Use Gemini AI to analyze and extract project requirements
-      const analysisPrompt = `تحليل متطلبات المشروع من المحادثة التالية:
-
-${userMessages}
+      const contextPrompt = `تحليل متطلبات المشروع من المحادثة التالية:
 
 استخرج المعلومات التالية بشكل موجز وواضح:
 1. وصف المشروع (جملتين-3)
@@ -633,7 +630,8 @@ ${userMessages}
 
 أجب بهذا التنسيق بالعربية:`;
 
-      const aiAnalysis = await geminiService.generateResponse(analysisPrompt);
+      const safePrompt = InputSanitizer.createSafePrompt(sanitizedUserMessages, contextPrompt);
+      const aiAnalysis = await geminiService.generateResponse(safePrompt);
       
       // Extract estimated budget if mentioned
       const budgetMatch = userMessages.match(/\d+/);
@@ -659,6 +657,47 @@ ${userMessages}
   }
 
   /**
+   * Extract service type from conversation history
+   * @param {Array} conversationHistory - Conversation messages
+   * @returns {string|null} Service type or null
+   */
+  extractServiceFromConversation(conversationHistory) {
+    try {
+      const userMessages = conversationHistory
+        .filter(msg => msg.role === 'user')
+        .map(msg => msg.content)
+        .join(' ')
+        .toLowerCase();
+
+      // Service keywords mapping - aligned with Gemini system prompt categories
+      const serviceKeywords = {
+        'الأعمال': ['بيانات', 'تخطيط', 'استشارات', 'تجارة', 'قانوني', 'محاسبة', 'أبحاث', 'مساعد', 'عملاء', 'موارد', 'إداري'],
+        'تطوير': ['web dev', 'website', 'موقع', 'تطوير', 'برمجة', 'development', 'html', 'css', 'php', 'wordpress', 'java', 'python', 'android', 'ios', 'متجر'],
+        'تصميم': ['design', 'تصميم', 'شعار', 'logo', 'ui', 'ux', 'جرافيك', 'بنر', 'فلاير', 'بطاقة', 'عرض', 'صور', 'رسوم'],
+        'تسويق': ['تسويق', 'marketing', 'إعلان', 'social media', 'انستقرام', 'فيسبوك', 'سناب', 'تويتر', 'يوتيوب', 'seo', 'sem'],
+        'كتابة': ['كتابة', 'محتوى', 'content', 'writing', 'مقال', 'سيناريو', 'نصوص', 'سيرة', 'تفريغ'],
+        'ترجمة': ['ترجمة', 'translate', 'translation', 'تدقيق', 'تلخيص'],
+        'فيديو': ['مونتاج', 'فيديو', 'video', 'موشن', 'أنيميشن', 'مقدمات', 'صوت', 'بودكاست', 'موسيقى'],
+        'تدريب': ['تدريب', 'دورات', 'تعليم', 'استشارات', 'حقائب']
+      };
+
+      // Search for matching keywords
+      for (const [service, keywords] of Object.entries(serviceKeywords)) {
+        for (const keyword of keywords) {
+          if (userMessages.includes(keyword)) {
+            return service;
+          }
+        }
+      }
+
+      return null;
+    } catch (error) {
+      logger.error('Error extracting service from conversation:', error);
+      return null;
+    }
+  }
+
+  /**
    * Get the last recommended freelancer from conversation
    * @param {string} clientPhone - Client phone number
    * @param {Array} conversationHistory - Conversation history
@@ -666,36 +705,63 @@ ${userMessages}
    */
   async getLastRecommendedFreelancer(clientPhone, conversationHistory) {
     try {
-      // Look for the last AI response that recommended a freelancer
-      const aiMessages = conversationHistory
-        .filter(msg => msg.role === 'assistant')
-        .reverse(); // Start from most recent
+      // First, try to get actual freelancers from database
+      // Extract service type from conversation or use generic search
+      const serviceQuery = this.extractServiceFromConversation(conversationHistory) || 'تطوير';
+      const freelancers = await supabaseService.searchFreelancersByService(serviceQuery, 5);
       
-      // For now, return sample freelancer data
-      // In production, this should extract freelancer info from the AI response
-      const sampleFreelancers = [
-        {
-          id: 'd0f55e6f-9cb7-49ca-b6c6-718c4ea698e3',
-          full_name: 'فاطمة علي السعد',
-          field: 'تطوير المواقع الإلكترونية',
-          average_rating: 4.9,
-          email: 'fatma.alsaad@example.com'
-        },
-        {
-          id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
-          full_name: 'محمد أحمد العتيبي',
-          field: 'تصميم جرافيك وشعارات',
-          average_rating: 4.7,
-          email: 'mohammed.alotaibi@example.com'
-        }
-      ];
+      if (freelancers && freelancers.length > 0) {
+        // Return a random freelancer from actual database results
+        const randomIndex = Math.floor(Math.random() * freelancers.length);
+        const selectedFreelancer = freelancers[randomIndex];
+        
+        logger.info('✅ Selected freelancer from database', {
+          freelancerId: selectedFreelancer.id,
+          freelancerName: selectedFreelancer.full_name,
+          field: selectedFreelancer.field
+        });
+        
+        return selectedFreelancer;
+      }
       
-      // Return a random freelancer for demo purposes
-      const randomIndex = Math.floor(Math.random() * sampleFreelancers.length);
-      return sampleFreelancers[randomIndex];
+      // If no freelancers found in database, get any available freelancer as fallback
+      logger.warn('❌ No freelancers found with specific search, trying generic search', {
+        query: serviceQuery
+      });
+      
+      // Try a more generic search for any available freelancer
+      const { data: allFreelancers, error: allFreelancersError } = await supabaseService.supabase
+        .from('freelancers')
+        .select(`
+          *,
+          profiles!inner (*)
+        `)
+        .eq('is_verified', true)
+        .limit(1);
+      
+      if (allFreelancersError) {
+        logger.error('❌ Error getting any freelancer:', allFreelancersError);
+      } else if (allFreelancers && allFreelancers.length > 0) {
+        const freelancer = allFreelancers[0];
+        logger.info('✅ Using fallback freelancer', {
+          freelancerId: freelancer.id,
+          freelancerName: freelancer.full_name
+        });
+        return freelancer;
+      }
+      
+      // If no freelancers found in database, return null
+      logger.error('❌ No freelancers found in database', {
+        query: serviceQuery,
+        reason: 'Database is empty or no matching freelancers'
+      });
+
+      return null;
       
     } catch (error) {
       logger.error('Error getting recommended freelancer:', error);
+
+      // Return null instead of hardcoded fallback
       return null;
     }
   }
@@ -716,54 +782,33 @@ ${userMessages}
       } = notificationData;
 
       // Generate AI explanation of why this freelancer was chosen
-      const whyChosenPrompt = `بناءً على متطلبات المشروع التالية: ${projectContext.description}
-
-وضح في 2-3 جمل لماذا تم اختيار هذا المستقل بشكل شخصي ومحترف:`;
+      const sanitizedDescription = InputSanitizer.sanitizeForAI(projectContext.description || 'مشروع جديد');
+      const contextPrompt = `وضح في 2-3 جمل لماذا تم اختيار هذا المستقل بشكل شخصي ومحترف:`;
+      const safePrompt = InputSanitizer.createSafePrompt(
+        `بناءً على متطلبات المشروع التالية: ${sanitizedDescription}`,
+        contextPrompt
+      );
       
-      const whyChosen = await geminiService.generateResponse(whyChosenPrompt) || 
+      const whyChosen = await geminiService.generateResponse(safePrompt) || 
         'تم اختيارك بناءً على خبرتك وتقييماتك الممتازة';
 
-      // Create notification record in database
-      const { data, error } = await supabaseService.supabase
-        .from('client_freelancer_notifications')
-        .insert({
-          freelancer_id: freelancerId,
-          client_whatsapp_phone: clientPhone,
-          client_name: clientName,
-          client_email: null, // Could be extracted from profile if available
-          project_description: projectContext.description,
-          project_requirements: projectContext.requirements,
-          estimated_budget: projectContext.estimatedBudget,
-          timeline_expectation: 'غير محدد', // Could be extracted from conversation
-          why_chosen: whyChosen,
-          conversation_summary: projectContext.conversationSummary,
-          ai_recommendation_reason: 'تم الاختيار بناءً على تحليل ذكي لمتطلبات العميل',
-          payment_amount: paymentAmount,
-          payment_status: 'pending',
-          myfatoorah_invoice_id: invoiceId,
-          selection_date: new Date().toISOString(),
-          is_read: false,
-          is_archived: false
-        })
-        .select()
-        .single();
-
-      if (error) {
-        logger.error('Error creating freelancer notification:', error);
-        throw error;
-      }
-
-      logger.info('✅ Freelancer notification created successfully', {
-        notificationId: data.id,
+      // Log the selection for debugging purposes
+      logger.info('✅ Freelancer selected successfully', {
         freelancerId,
         clientPhone,
         projectType: projectContext.description.substring(0, 50)
       });
 
-      return data;
+      // Return a simple success object instead of creating a notification
+      return {
+        success: true,
+        freelancerId,
+        clientPhone,
+        projectDescription: projectContext.description
+      };
       
     } catch (error) {
-      logger.error('❌ Failed to create freelancer notification:', error);
+      logger.error('❌ Failed to process freelancer selection:', error);
       throw error;
     }
   }

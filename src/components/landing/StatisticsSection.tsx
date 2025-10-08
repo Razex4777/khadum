@@ -2,7 +2,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import { Users, FileCheck, TrendingUp, Award, Star, Clock } from "lucide-react";
 
-interface StatisticsSectionProps { lang: 'ar' | 'en'; }
 
 const Counter = ({ to, duration = 2000 }: { to: number; duration?: number }) => {
   const [value, setValue] = useState(0);
@@ -22,9 +21,8 @@ const Counter = ({ to, duration = 2000 }: { to: number; duration?: number }) => 
   return <span>{value.toLocaleString()}</span>;
 };
 
-const StatisticsSection = ({ lang }: StatisticsSectionProps) => {
+const StatisticsSection = () => {
   const t = {
-    ar: {
       title: "أرقام تتحدث عن نفسها",
       subtitle: "انضم إلى آلاف المستقلين والعملاء الذين يثقون في خدوم",
       stats: [
@@ -79,64 +77,7 @@ const StatisticsSection = ({ lang }: StatisticsSectionProps) => {
           bgColor: "bg-purple-600/10",
         },
       ],
-    },
-    en: {
-      title: "Numbers Speak for Themselves",
-      subtitle: "Join thousands of freelancers and clients who trust Khadoom",
-      stats: [
-        {
-          icon: FileCheck,
-          label: "Projects Completed",
-          value: 12400,
-          suffix: "+",
-          color: "text-primary",
-          bgColor: "bg-primary/10",
-        },
-        {
-          icon: Users,
-          label: "Active Freelancers",
-          value: 870,
-          suffix: "+",
-          color: "text-blue-600",
-          bgColor: "bg-blue-600/10",
-        },
-        {
-          icon: TrendingUp,
-          label: "Total Earnings",
-          value: 920000,
-          prefix: "$",
-          suffix: "",
-          color: "text-emerald-600",
-          bgColor: "bg-emerald-600/10",
-        },
-        {
-          icon: Award,
-          label: "Satisfaction Rate",
-          value: 98,
-          suffix: "%",
-          color: "text-amber-600",
-          bgColor: "bg-amber-600/10",
-        },
-        {
-          icon: Star,
-          label: "Platform Rating",
-          value: 4.9,
-          suffix: "/5.0",
-          color: "text-orange-600",
-          bgColor: "bg-orange-600/10",
-          decimals: true,
-        },
-        {
-          icon: Clock,
-          label: "Avg. Hiring Time",
-          value: 24,
-          suffix: " hours",
-          color: "text-purple-600",
-          bgColor: "bg-purple-600/10",
-        },
-      ],
-    },
-  }[lang];
+  };
 
   return (
     <section className="container py-16 md:py-24">

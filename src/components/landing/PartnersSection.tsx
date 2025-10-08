@@ -1,9 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Building2, Briefcase, Code, Palette, TrendingUp, Users, FileText, Camera } from "lucide-react";
 
-interface PartnersSectionProps { lang: 'ar' | 'en'; }
-
-const PartnersSection = ({ lang }: PartnersSectionProps) => {
+const PartnersSection = () => {
   const t = {
     ar: {
       title: "شركاء النجاح",

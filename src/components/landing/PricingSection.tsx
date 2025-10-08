@@ -4,13 +4,10 @@ import { Badge } from "@/components/ui/badge";
 import { Check, X, Star, Zap, Crown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-interface PricingSectionProps { lang: 'ar' | 'en'; }
-
-const PricingSection = ({ lang }: PricingSectionProps) => {
+const PricingSection = () => {
   const navigate = useNavigate();
 
   const t = {
-    ar: {
       title: "خطط تناسب احتياجاتك",
       subtitle: "اختر الخطة المناسبة لك وابدأ رحلتك مع خدوم",
       monthly: "شهريًا",
@@ -78,77 +75,7 @@ const PricingSection = ({ lang }: PricingSectionProps) => {
           highlighted: false,
         },
       ],
-    },
-    en: {
-      title: "Plans That Fit Your Needs",
-      subtitle: "Choose the perfect plan for you and start your journey with Khadoom",
-      monthly: "per month",
-      popular: "Most Popular",
-      getStarted: "Get Started",
-      currentPlan: "Current Plan",
-      features: "Features",
-      sar: "SAR",
-      plans: [
-        {
-          name: "Free",
-          icon: Star,
-          price: 0,
-          description: "Perfect for getting started",
-          badge: null,
-          features: [
-            { text: "Apply to 3 projects per month", included: true },
-            { text: "15% commission on projects", included: true },
-            { text: "Email support", included: true },
-            { text: "Basic profile", included: true },
-            { text: "Limited WhatsApp notifications", included: true },
-            { text: "Priority in search results", included: false },
-            { text: "24/7 live support", included: false },
-            { text: "Verification badge", included: false },
-          ],
-          buttonVariant: "outline" as const,
-          highlighted: false,
-        },
-        {
-          name: "Professional",
-          icon: Zap,
-          price: "TBA",
-          description: "For serious freelancers growing their business",
-          badge: "Coming Soon",
-          features: [
-            { text: "Unlimited projects", included: true },
-            { text: "10% commission on projects", included: true },
-            { text: "WhatsApp live support", included: true },
-            { text: "Advanced profile", included: true },
-            { text: "Instant notifications for all projects", included: true },
-            { text: "Priority in search results", included: true },
-            { text: "Detailed performance analytics", included: true },
-            { text: "Verification badge", included: false },
-          ],
-          buttonVariant: "default" as const,
-          highlighted: true,
-        },
-        {
-          name: "Enterprise",
-          icon: Crown,
-          price: "TBA",
-          description: "For large companies and agencies",
-          badge: "Coming Soon",
-          features: [
-            { text: "All Professional features", included: true },
-            { text: "5% commission on projects", included: true },
-            { text: "Dedicated account manager", included: true },
-            { text: "Multiple team accounts", included: true },
-            { text: "24/7 live support", included: true },
-            { text: "Highest priority in search", included: true },
-            { text: "Advanced reports & analytics", included: true },
-            { text: "Gold verification badge", included: true },
-          ],
-          buttonVariant: "default" as const,
-          highlighted: false,
-        },
-      ],
-    },
-  }[lang];
+  };
 
   return (
     <section className="container py-16 md:py-24 bg-gradient-to-b from-background to-muted/20">

@@ -2,11 +2,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ShieldCheck, Bot, CreditCard, Languages, Zap, Lock, Bell, BarChart3, Clock, Users, Award, HeadphonesIcon } from "lucide-react";
 
-interface FeaturesEnhancedProps { lang: 'ar' | 'en'; }
-
-const FeaturesEnhanced = ({ lang }: FeaturesEnhancedProps) => {
+const FeaturesEnhanced = () => {
   const t = {
-    ar: {
       title: "مميزات تجعلنا الخيار الأفضل",
       subtitle: "نوفر لك كل ما تحتاجه لبناء عمل مستقل ناجح",
       mainFeatures: [
@@ -63,66 +60,7 @@ const FeaturesEnhanced = ({ lang }: FeaturesEnhancedProps) => {
           icon: ShieldCheck,
         },
       ],
-    },
-    en: {
-      title: "Features That Make Us The Best Choice",
-      subtitle: "We provide everything you need to build a successful freelance business",
-      mainFeatures: [
-        {
-          icon: ShieldCheck,
-          title: "Advanced Security & Encryption",
-          description: "Protect your chats and transactions with the highest global security standards and end-to-end encryption",
-          badge: "Top Priority",
-          color: "text-primary",
-          bgColor: "bg-primary/10",
-        },
-        {
-          icon: CreditCard,
-          title: "Secure & Flexible Payment",
-          description: "Trusted payment system integrated with MyFatoorah supporting all credit cards and digital wallets",
-          badge: "Trusted",
-          color: "text-emerald-600",
-          bgColor: "bg-emerald-600/10",
-        },
-        {
-          icon: Bot,
-          title: "Advanced AI Intelligence",
-          description: "Smart matching between clients and freelancers using AI technology from Google Gemini",
-          badge: "AI Powered",
-          color: "text-blue-600",
-          bgColor: "bg-blue-600/10",
-        },
-      ],
-      additionalFeatures: [
-        { icon: Zap, title: "Instant Response", desc: "Quick replies to project requests within minutes" },
-        { icon: Lock, title: "Guaranteed Privacy", desc: "We don't share your data with any third party" },
-        { icon: Bell, title: "Smart Notifications", desc: "Get instant alerts for every new project" },
-        { icon: BarChart3, title: "Detailed Analytics", desc: "Track your performance and earnings with comprehensive reports" },
-        { icon: Clock, title: "24/7 Support", desc: "Support team available around the clock" },
-        { icon: Users, title: "Active Community", desc: "Join thousands of active freelancers" },
-        { icon: Award, title: "Excellence Badges", desc: "Earn excellence badges for top performance" },
-        { icon: Languages, title: "Multilingual", desc: "Full support for Arabic and English" },
-      ],
-      whyChooseUs: "Why Choose Khadoom?",
-      reasons: [
-        {
-          title: "Easy to Use",
-          description: "Simple WhatsApp interface requiring no technical expertise",
-          icon: Bot,
-        },
-        {
-          title: "Low Commission",
-          description: "Competitive commission rates starting from only 5%",
-          icon: CreditCard,
-        },
-        {
-          title: "High Credibility",
-          description: "Transparent rating system and protection for both parties",
-          icon: ShieldCheck,
-        },
-      ],
-    },
-  }[lang];
+  };
 
   return (
     <section className="py-16 md:py-24">

@@ -1,4 +1,4 @@
-import { supabaseService } from './supabaseService.js';
+import { supabaseService } from './supabaseservice/index.js';
 import { whatsappService } from './whatsappService.js';
 import { logger } from '../utils/logger.js';
 
@@ -184,7 +184,9 @@ class PaymentExpirationService {
     return {
       isRunning: this.isRunning,
       checkInterval: this.checkIntervalMs,
-      nextCheck: this.isRunning ? new Date(Date.now() + this.checkIntervalMs).toISOString() : null
+      nextCheck: this.isRunning
+        ? 'Unknown (depends on interval start time)'
+        : null
     };
   }
 }

@@ -1,5 +1,5 @@
 import express from 'express';
-import { supabaseService } from '../services/supabaseService.js';
+import { supabaseService } from '../services/supabaseservice/index.js';
 import { config } from '../config/config.js';
 import { logger } from '../utils/logger.js';
 

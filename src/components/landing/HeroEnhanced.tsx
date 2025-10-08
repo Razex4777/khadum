@@ -9,9 +9,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MessageCircle, UserPlus, Calculator, Search } from "lucide-react";
 
-interface HeroEnhancedProps { lang: 'ar' | 'en'; }
-
-const HeroEnhanced = ({ lang }: HeroEnhancedProps) => {
+const HeroEnhanced = () => {
   const navigate = useNavigate();
   const [budget, setBudget] = useState(5000);
   const [projectType, setProjectType] = useState("web-dev");
@@ -19,55 +17,29 @@ const HeroEnhanced = ({ lang }: HeroEnhancedProps) => {
   const [estimatedCost, setEstimatedCost] = useState(0);
 
   const t = {
-    ar: {
-      title: "خدوم — منصة المستقلين الذكية",
-      subtitle: "احسب تكلفة مشروعك أو ابحث عن المستقل المناسب فورًا",
-      cta1: "انضم كمستقل",
-      cta2: "ابدأ مع واتساب",
-      calcTab: "حاسبة التكلفة",
-      searchTab: "ابحث عن مستقل",
-      budgetLabel: "الميزانية المتوقعة",
-      projectTypeLabel: "نوع المشروع",
-      durationLabel: "المدة المتوقعة (أسابيع)",
-      projectTypes: {
-        "web-dev": "تطوير ويب",
-        "mobile-app": "تطبيق موبايل",
-        "design": "تصميم جرافيك",
-        "content": "كتابة محتوى",
-        "marketing": "تسويق رقمي",
-      },
-      estimatedLabel: "التكلفة المتوقعة",
-      skillsLabel: "المهارات المطلوبة",
-      skillsPlaceholder: "مثل: React, Node.js, Design",
-      findBtn: "ابحث الآن",
-      calculateBtn: "احسب التكلفة",
-      sar: "ر.س",
+    title: "خدوم — منصة المستقلين الذكية",
+    subtitle: "احسب تكلفة مشروعك أو ابحث عن المستقل المناسب فورًا",
+    cta1: "انضم كمستقل",
+    cta2: "ابدأ مع واتساب",
+    calcTab: "حاسبة التكلفة",
+    searchTab: "ابحث عن مستقل",
+    budgetLabel: "الميزانية المتوقعة",
+    projectTypeLabel: "نوع المشروع",
+    durationLabel: "المدة المتوقعة (أسابيع)",
+    projectTypes: {
+      "web-dev": "تطوير ويب",
+      "mobile-app": "تطبيق موبايل",
+      "design": "تصميم جرافيك",
+      "content": "كتابة محتوى",
+      "marketing": "تسويق رقمي",
     },
-    en: {
-      title: "Khadoom — Smart Freelancer Platform",
-      subtitle: "Calculate your project cost or find the perfect freelancer instantly",
-      cta1: "Join as Freelancer",
-      cta2: "Start with WhatsApp",
-      calcTab: "Cost Calculator",
-      searchTab: "Find Freelancer",
-      budgetLabel: "Expected Budget",
-      projectTypeLabel: "Project Type",
-      durationLabel: "Expected Duration (weeks)",
-      projectTypes: {
-        "web-dev": "Web Development",
-        "mobile-app": "Mobile App",
-        "design": "Graphic Design",
-        "content": "Content Writing",
-        "marketing": "Digital Marketing",
-      },
-      estimatedLabel: "Estimated Cost",
-      skillsLabel: "Required Skills",
-      skillsPlaceholder: "e.g., React, Node.js, Design",
-      findBtn: "Search Now",
-      calculateBtn: "Calculate Cost",
-      sar: "SAR",
-    },
-  }[lang];
+    estimatedLabel: "التكلفة المتوقعة",
+    skillsLabel: "المهارات المطلوبة",
+    skillsPlaceholder: "مثل: React, Node.js, Design",
+    findBtn: "ابحث الآن",
+    calculateBtn: "احسب التكلفة",
+    sar: "ر.س",
+  };
 
   useEffect(() => {
     // Simple calculation logic

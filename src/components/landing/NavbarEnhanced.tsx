@@ -2,21 +2,16 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
-import { MessageCircle, UserPlus, Globe } from "lucide-react";
+import { MessageCircle, UserPlus } from "lucide-react";
 
-interface NavbarEnhancedProps {
-  lang: 'ar' | 'en';
-  onToggleLang: () => void;
-}
-
-const NavbarEnhanced = ({ lang, onToggleLang }: NavbarEnhancedProps) => {
+const NavbarEnhanced = () => {
   const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
-    document.documentElement.lang = lang === 'ar' ? 'ar' : 'en';
-    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
-  }, [lang]);
+    document.documentElement.lang = 'ar';
+    document.documentElement.dir = 'rtl';
+  }, []);
 
   // Scroll detection for floating pill effect
   useEffect(() => {
@@ -29,25 +24,13 @@ const NavbarEnhanced = ({ lang, onToggleLang }: NavbarEnhancedProps) => {
   }, []);
 
   const labels = {
-    ar: { 
-      brand: 'خدوم', 
-      whatsapp: 'واتساب', 
-      become: 'انضم كمستقل', 
-      lang: 'EN',
-      features: 'المميزات',
-      pricing: 'الأسعار',
-      about: 'عن خدوم'
-    },
-    en: { 
-      brand: 'Khadoom', 
-      whatsapp: 'WhatsApp', 
-      become: 'Join as Freelancer', 
-      lang: 'AR',
-      features: 'Features',
-      pricing: 'Pricing',
-      about: 'About'
-    },
-  }[lang];
+    brand: 'خدوم',
+    whatsapp: 'واتساب',
+    become: 'انضم كمستقل',
+    features: 'المميزات',
+    pricing: 'الأسعار',
+    about: 'عن خدوم'
+  };
 
   const handleWhatsAppClick = () => {
     const phoneNumber = '+966509811981';
@@ -134,7 +117,7 @@ const NavbarEnhanced = ({ lang, onToggleLang }: NavbarEnhancedProps) => {
               className="hover:bg-primary/10 hover:text-primary transition-colors"
               onClick={() => scrollToSection('testimonials')}
             >
-              {lang === 'ar' ? 'التقييمات' : 'Testimonials'}
+              التقييمات
             </Button>
           </div>
 
@@ -143,16 +126,6 @@ const NavbarEnhanced = ({ lang, onToggleLang }: NavbarEnhancedProps) => {
             flex items-center transition-all duration-300
             ${isScrolled ? 'gap-2' : 'gap-3'}
           `}>
-            {/* Language Toggle */}
-            <Button
-              variant="ghost"
-              size={isScrolled ? "sm" : "default"}
-              className="hover:bg-primary/10 hover:text-primary transition-colors gap-1.5"
-              onClick={onToggleLang}
-            >
-              <Globe className={isScrolled ? "w-3.5 h-3.5" : "w-4 h-4"} />
-              {labels.lang}
-            </Button>
 
             {/* WhatsApp Button */}
             <Button 

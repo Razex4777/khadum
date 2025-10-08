@@ -3,6 +3,7 @@ import { config } from '../config/config.js';
 import { logger } from '../utils/logger.js';
 import { whatsappService } from '../services/whatsappService.js';
 import { messageProcessor } from '../controllers/messageProcessor.js';
+import { mediaHandler } from '../services/mediaHandler.js';
 
 const router = express.Router();
 
@@ -98,36 +99,81 @@ async function processWebhookChange(change) {
     // Handle incoming messages
     if (value.messages && value.messages.length > 0) {
       for (const message of value.messages) {
-        // Process text and interactive messages
-        if (message.type !== 'text' && message.type !== 'interactive') {
+        // Handle different message types
+        if (message.type === 'text' || message.type === 'interactive') {
+          // Process text and interactive messages
+          const messageData = whatsappService.extractMessageData({ 
+            entry: [{ 
+              changes: [{ 
+                value: { 
+                  messages: [message], 
+                  contacts: value.contacts 
+                } 
+              }] 
+            }] 
+          });
+
+          if (messageData) {
+            await messageProcessor.processMessage(messageData);
+          }
+        } else if (['image', 'video', 'audio', 'document', 'sticker'].includes(message.type)) {
+          // Process media messages
+          await processMediaMessage(message, value.contacts);
+        } else {
           logger.info(`Ignoring unsupported message type: ${message.type}`);
           await whatsappService.sendMessage(
             message.from,
-            '📝 عذراً، أستطيع فقط معالجة الرسائل النصية والأزرار التفاعلية. يرجى إرسال رسالة نصية!'
+            '📝 عذراً، نوع الرسالة غير مدعوم حالياً. يرجى إرسال رسالة نصية أو ملف مدعوم!'
           );
-          continue;
-        }
-
-        // Extract message data using WhatsApp service method
-        const messageData = whatsappService.extractMessageData({ 
-          entry: [{ 
-            changes: [{ 
-              value: { 
-                messages: [message], 
-                contacts: value.contacts 
-              } 
-            }] 
-          }] 
-        });
-
-        if (messageData) {
-          // Process the message
-          await messageProcessor.processMessage(messageData);
         }
       }
     }
   } catch (error) {
     logger.error('Error processing webhook change:', error);
+  }
+}
+
+/**
+ * Process media message
+ * @param {Object} message - WhatsApp message object
+ * @param {Array} contacts - Contact information
+ */
+async function processMediaMessage(message, contacts) {
+  try {
+    const contact = contacts?.[0];
+    const name = contact?.profile?.name || 'User';
+    
+    logger.info(`📎 Processing ${message.type} from ${name} (${message.from})`);
+
+    // Extract media data
+    const mediaData = mediaHandler.extractMediaData(message);
+    if (!mediaData) {
+      logger.warn('Could not extract media data from message', { messageId: message.id });
+      return;
+    }
+
+    // Create message data object
+    const messageData = {
+      messageId: message.id,
+      from: message.from,
+      name: name,
+      type: message.type,
+      mediaType: mediaData.mediaType,
+      mediaId: mediaData.mediaId,
+      mimeType: mediaData.mimeType,
+      caption: mediaData.caption,
+      timestamp: message.timestamp
+    };
+
+    // Process the media message
+    await mediaHandler.processMediaMessage(messageData);
+
+  } catch (error) {
+    logger.error('Error processing media message:', error);
+    await whatsappService.sendMessage(
+      message.from,
+      '❌ حدث خطأ في معالجة الملف\n❌ Error processing media file'
+    );
   }
 }
 

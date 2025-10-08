@@ -30,11 +30,23 @@ export const config = {
   supabase: {
     url: process.env.SUPABASE_URL,
     anonKey: process.env.SUPABASE_ANON_KEY,
-    tableName: 'chatbot_history'
+    tableName: 'chat_history'
   },
   server: {
     port: process.env.PORT || 3000,
-    nodeEnv: process.env.NODE_ENV || 'development'
+    nodeEnv: process.env.NODE_ENV || 'development',
+    allowDevCommands: process.env.ALLOW_DEV_COMMANDS === 'true' || process.env.NODE_ENV === 'development'
+  },
+  mockPayment: {
+    enabled: process.env.ENABLE_MOCK_PAYMENTS === 'true' || process.env.NODE_ENV !== 'production',
+    invoiceSeed: parseInt(process.env.MOCK_INVOICE_SEED) || 2000000,
+    portalUrl: process.env.MOCK_PORTAL_URL || 'https://portal.myfatoorah.com/ar/KSA/PayInvoice',
+    expiryHours: parseInt(process.env.MOCK_PAYMENT_EXPIRY_HOURS) || 12,
+    apiDelayMs: parseInt(process.env.MOCK_API_DELAY_MS) || 500,
+    successMessage: process.env.MOCK_SUCCESS_MESSAGE || '✅ تم إنشاء وإكمال الدفع تلقائياً\n📋 رقم الفاتورة: {invoiceId}\n⚡ جاري معالجة البيانات...'
+  },
+  frontend: {
+    url: process.env.FRONTEND_URL || 'http://localhost:8080'
   },
   myfatoorah: {
     apiKey: process.env.MYFATOORAH_API_KEY, // Use the main API key for authentication
@@ -68,4 +80,12 @@ export function validateConfig() {
 }
 
 // Validate config on module load
-validateConfig();
+try {
+  validateConfig();
+} catch (error) {
+  console.error('Configuration validation failed:', error.message);
+  // Don't throw in development to allow testing
+  if (process.env.NODE_ENV === 'production') {
+    throw error;
+  }
+}

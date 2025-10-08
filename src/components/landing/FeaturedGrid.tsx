@@ -1,4 +1,3 @@
-interface FeaturedGridProps { lang: 'ar' | 'en'; }
 
 const data = [
   { name: 'مصمم 1', role: 'مصمم UI/UX', rating: 4.9 },
@@ -14,11 +13,11 @@ const dataEn = [
   { name: 'Marketer 1', role: 'Digital Marketer', rating: 4.6 },
 ];
 
-const FeaturedGrid = ({ lang }: FeaturedGridProps) => {
+const FeaturedGrid = () => {
   const t = {
-    ar: { title: 'مستقلون مميزون', items: data },
-    en: { title: 'Featured Freelancers', items: dataEn },
-  }[lang];
+    title: 'مستقلون مميزون',
+    items: data
+  };
 
   return (
     <section className="container py-16">

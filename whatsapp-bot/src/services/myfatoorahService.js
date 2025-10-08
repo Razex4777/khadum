@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { config } from '../config/config.js';
 import { logger } from '../utils/logger.js';
+import { PhoneValidator } from '../utils/phoneValidator.js';
 
 /**
  * MyFatoorah Payment Service
@@ -56,8 +57,23 @@ class MyFatoorahService {
 
       // Try real MyFatoorah API first with correct endpoint
       try {
-        // Clean phone number for MyFatoorah (remove country code, max 11 chars)
-        const cleanPhone = clientPhone.replace(/[^\d]/g, '').slice(-11); // Take last 11 digits
+        // Validate and normalize phone number
+        const phoneValidation = PhoneValidator.validateAndNormalize(clientPhone);
+        if (!phoneValidation.isValid) {
+          throw new Error(`Invalid phone number: ${phoneValidation.error}`);
+        }
+        
+        let cleanPhone = phoneValidation.myfatoorahPhone; // Take phone formatted for MyFatoorah
+        
+        // Additional validation for MyFatoorah CustomerMobile field (max 11 digits)
+        if (cleanPhone.length > 11) {
+          // This should not happen with our updated phone validator, but let's be safe
+          cleanPhone = cleanPhone.slice(-11);
+          logger.warn('📱 Emergency truncation of phone number for MyFatoorah compatibility', {
+            original: phoneValidation.myfatoorahPhone,
+            truncated: cleanPhone
+          });
+        }
         
         const payload = {
           CustomerName: clientName,
@@ -65,7 +81,7 @@ class MyFatoorahService {
           InvoiceValue: amount,
           DisplayCurrencyIso: this.currency,
           CustomerMobile: cleanPhone,
-          CustomerEmail: `${clientPhone.replace(/[^\d]/g, '')}@temp.khadum.com`,
+          CustomerEmail: PhoneValidator.generateEmailFromPhone(clientPhone),
           CallBackUrl: `${process.env.WEBHOOK_BASE_URL || 'https://khadum.com'}/webhook/myfatoorah/callback`,
           ErrorUrl: `${process.env.WEBHOOK_BASE_URL || 'https://khadum.com'}/webhook/myfatoorah/error`,
           Language: 'AR',
@@ -357,22 +373,36 @@ ${paymentLinkData.paymentUrl}
   /**
    * Format payment success message
    * @param {Object} paymentData - Payment confirmation data
+   * @param {Object} freelancerData - Freelancer information (optional)
+   * @param {string} clientName - Client name for conversation display (optional)
    * @returns {string} Success message
    */
-  formatSuccessMessage(paymentData) {
-    return `🎉 تم الدفع بنجاح!
+  formatSuccessMessage(paymentData, freelancerData = null, clientName = null, options = {}) {
+    const { includeBridgeNotice = false } = options;
+    const baseMessage = `🎉 تم الدفع بنجاح!
 
-✅ تأكيد الدفع:
-   • المبلغ: ${paymentData.paidAmount} ريال سعودي
-   • التاريخ: ${new Date(paymentData.paidDate).toLocaleString('ar-SA')}
-   • رقم العملية: ${paymentData.invoiceId}
+✅ تم إضافتك لقاعدة البيانات
+👤 المستقل: ${freelancerData?.full_name || 'غير محدد'}
+💰 المبلغ: ${paymentData.paidAmount} ريال
+📋 رقم الفاتورة: ${paymentData.invoiceId}
 
-🚀 الخطوات التالية:
-1️⃣ سيتم إشعار المستقل بطلبك
-2️⃣ سيتواصل معك المستقل قريباً
-3️⃣ ستبدأ العمل على مشروعك
+🤖 يمكنك الآن التحدث معي بشكل طبيعي!
+ℹ️ ملاحظة: ستتواصل مع المستقل خارج النظام حسب التفاصيل المتفق عليها.`;
 
-شكراً لاستخدامك منصة خدوم! 🌟`;
+    if (!includeBridgeNotice || !freelancerData?.full_name) {
+      return baseMessage;
+    }
+
+    const bridgeNotice = `
+
+🌉 تم تفعيل وضع الجسر التلقائي!
+
+الآن يمكنك التواصل المباشر مع ${freelancerData.full_name} عبر هذا الرقم.
+سي م توجيه جميع رسائلك إلى المستقل والعكس صحيح.
+
+اكتب /end_bridge_mode لإنهاء هذا الوضع في أي وقت.`.replace('سي م','سيتم');
+
+    return baseMessage + bridgeNotice;
   }
 }
 

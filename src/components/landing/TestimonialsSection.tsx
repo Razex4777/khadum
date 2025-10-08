@@ -2,11 +2,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Star, Quote } from "lucide-react";
 
-interface TestimonialsSectionProps { lang: 'ar' | 'en'; }
-
-const TestimonialsSection = ({ lang }: TestimonialsSectionProps) => {
+const TestimonialsSection = () => {
   const t = {
-    ar: {
       title: "ماذا يقول عملاؤنا",
       subtitle: "آراء حقيقية من مستقلين وعملاء استخدموا خدوم",
       testimonials: [
@@ -53,56 +50,7 @@ const TestimonialsSection = ({ lang }: TestimonialsSectionProps) => {
           text: "المنصة سهلة الاستخدام وأحصل على مشاريع بشكل مستمر. الدفع سريع وآمن. شكراً خدوم!",
         },
       ],
-    },
-    en: {
-      title: "What Our Clients Say",
-      subtitle: "Real reviews from freelancers and clients who used Khadoom",
-      testimonials: [
-        {
-          name: "Ahmed Al-Mutairi",
-          role: "Web Developer",
-          avatar: "/avatars/ahmad.jpg",
-          rating: 5,
-          text: "Khadoom changed the way I work as a freelancer. Now I get daily projects and payment is completely secure. Highly recommend!",
-        },
-        {
-          name: "Sarah Al-Ahmadi",
-          role: "Graphic Designer",
-          avatar: "/avatars/sara.jpg",
-          rating: 5,
-          text: "Amazing platform! Communication via WhatsApp is very easy and projects are diverse. Made excellent profits in the first month.",
-        },
-        {
-          name: "Mohammed Al-Otaibi",
-          role: "Tech Company Owner",
-          avatar: "/avatars/mohammed.jpg",
-          rating: 5,
-          text: "Found an excellent developer for my project in less than 24 hours. Professional service and highly skilled freelancers.",
-        },
-        {
-          name: "Fatima Al-Sahli",
-          role: "Content Writer",
-          avatar: "/avatars/fatima.jpg",
-          rating: 5,
-          text: "Best Arabic platform for freelancers. Excellent support and very reasonable commission compared to other platforms.",
-        },
-        {
-          name: "Khaled Al-Balushi",
-          role: "Marketing Manager",
-          avatar: "/avatars/khaled.jpg",
-          rating: 5,
-          text: "Used Khadoom to hire a complete marketing team. Results exceeded expectations and the process was very smooth.",
-        },
-        {
-          name: "Noura Al-Qahtani",
-          role: "Photographer",
-          avatar: "/avatars/noura.jpg",
-          rating: 5,
-          text: "Easy to use platform and I get consistent projects. Payment is fast and secure. Thank you Khadoom!",
-        },
-      ],
-    },
-  }[lang];
+  };
 
   return (
     <section className="container py-16 md:py-24">

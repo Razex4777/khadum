@@ -1,4 +1,5 @@
 import axios from 'axios';
+import FormData from 'form-data';
 import { config } from '../config/config.js';
 import { logger } from '../utils/logger.js';
 
@@ -41,6 +42,82 @@ class WhatsAppService {
       return response.data;
     } catch (error) {
       logger.error('Failed to send WhatsApp message:', error.response?.data || error.message);
+      throw error;
+    }
+  }
+
+  /**
+   * Send a media message to WhatsApp user
+   * @param {string} to - Recipient phone number
+   * @param {string} mediaType - Type of media (image, video, audio, document, sticker)
+   * @param {string} mediaId - WhatsApp media ID
+   * @param {string} caption - Optional caption
+   */
+  async sendMediaMessage(to, mediaType, mediaId, caption = '') {
+    try {
+      const payload = {
+        messaging_product: 'whatsapp',
+        recipient_type: 'individual',
+        to: to,
+        type: mediaType,
+        [mediaType]: {
+          id: mediaId,
+          caption: caption
+        }
+      };
+
+      const response = await axios.post(
+        this.baseUrl,
+        payload,
+        {
+          headers: {
+            'Authorization': `Bearer ${this.accessToken}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      logger.debug('WhatsApp media message sent', { to, mediaType, messageId: response.data.messages[0].id });
+      return response.data;
+    } catch (error) {
+      logger.error('Failed to send WhatsApp media message:', error.response?.data || error.message);
+      throw error;
+    }
+  }
+
+  /**
+   * Upload media to WhatsApp
+   * @param {Buffer} fileBuffer - File buffer
+   * @param {string} mimeType - MIME type
+   * @param {string} filename - File name
+   * @returns {Promise<string>} Media ID
+   */
+  async uploadMedia(fileBuffer, mimeType, filename) {
+    try {
+      const formData = new FormData();
+      
+      formData.append('file', fileBuffer, {
+        filename: filename,
+        contentType: mimeType
+      });
+      formData.append('type', mimeType);
+      formData.append('messaging_product', 'whatsapp');
+
+      const response = await axios.post(
+        `${config.whatsapp.apiUrl}/${config.whatsapp.phoneId}/media`,
+        formData,
+        {
+          headers: {
+            'Authorization': `Bearer ${this.accessToken}`,
+            ...formData.getHeaders()
+          }
+        }
+      );
+
+      logger.debug('Media uploaded successfully', { mediaId: response.data.id });
+      return response.data.id;
+    } catch (error) {
+      logger.error('Failed to upload media:', error.response?.data || error.message);
       throw error;
     }
   }

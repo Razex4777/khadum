@@ -13,27 +13,20 @@ import CTASection from '@/components/landing/CTASection';
 import FooterEnhanced from '@/components/landing/FooterEnhanced';
 
 const Index = () => {
-  const [lang, setLang] = useState<'ar' | 'en'>('ar');
-
   useEffect(() => {
-    document.title = lang === 'ar' ? 'خدوم — وسيطك الذكي عبر واتساب' : 'Khadoom — Smart WhatsApp Broker';
+    document.title = 'خدوم — وسيطك الذكي عبر واتساب';
     const metaDesc = document.querySelector('meta[name="description"]');
-    if (metaDesc) metaDesc.setAttribute('content', lang === 'ar' ? 'خدوم: بوت واتساب يربط العملاء بالمستقلين بسرعة وأمان.' : 'Khadoom: WhatsApp bot connecting clients with freelancers.');
-  }, [lang]);
+    if (metaDesc) metaDesc.setAttribute('content', 'خدوم: بوت واتساب يربط العملاء بالمستقلين بسرعة وأمان.');
+  }, []);
 
   // Structured data for FAQ
   useEffect(() => {
     const scriptId = 'faq-ldjson';
     let el = document.getElementById(scriptId) as HTMLScriptElement | null;
-    const items = (lang === 'ar'
-      ? [
-          { q: 'كيف أبدأ مع خدوم؟', a: 'اضغط على ابدأ الآن واتبِع التعليمات عبر واتساب.' },
-          { q: 'هل الدفع آمن؟', a: 'نعم، نوفر قنوات دفع موثوقة مع حماية للعميل والمستقل.' },
-        ]
-      : [
-          { q: 'How do I start?', a: 'Click Get Started and follow WhatsApp instructions.' },
-          { q: 'Is payment secure?', a: 'Yes, trusted payment channels with protection for both sides.' },
-        ]).map((i) => ({
+    const items = [
+        { q: 'كيف أبدأ مع خدوم؟', a: 'اضغط على ابدأ الآن واتبِع التعليمات عبر واتساب.' },
+        { q: 'هل الدفع آمن؟', a: 'نعم، نوفر قنوات دفع موثوقة مع حماية للعميل والمستقل.' },
+      ].map((i) => ({
           '@type': 'Question',
           name: i.q,
           acceptedAnswer: { '@type': 'Answer', text: i.a },
@@ -58,26 +51,26 @@ const Index = () => {
 
   return (
     <div className="font-tajawal">
-      <NavbarEnhanced lang={lang} onToggleLang={() => setLang((l) => (l === 'ar' ? 'en' : 'ar'))} />
+      <NavbarEnhanced />
       <main className="overflow-hidden">
-        <HeroEnhanced lang={lang} />
+        <HeroEnhanced />
         <div id="statistics">
-          <StatisticsSection lang={lang} />
+          <StatisticsSection />
         </div>
         <div id="features">
-          <FeaturesEnhanced lang={lang} />
+          <FeaturesEnhanced />
         </div>
-        <HowItWorksEnhanced lang={lang} />
+        <HowItWorksEnhanced />
         <div id="pricing">
-          <PricingSection lang={lang} />
+          <PricingSection />
         </div>
         <div id="testimonials">
-          <TestimonialsSection lang={lang} />
+          <TestimonialsSection />
         </div>
-        <PartnersSection lang={lang} />
-        <FeaturedGrid lang={lang} />
-        <FAQSection lang={lang} />
-        <CTASection lang={lang} />
+        <PartnersSection />
+        <FeaturedGrid />
+        <FAQSection />
+        <CTASection />
       </main>
       <FooterEnhanced />
     </div>

@@ -1,15 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
-interface CTASectionProps { lang: 'ar' | 'en'; }
-
-const CTASection = ({ lang }: CTASectionProps) => {
+const CTASection = () => {
   const navigate = useNavigate();
   
   const t = {
-    ar: { title: 'جاهز للبدء؟', sub: 'انطلق الآن عبر واتساب وابدأ مشروعك بأمان.', cta: 'ابدأ الآن' },
-    en: { title: 'Ready to start?', sub: 'Kick off via WhatsApp and launch your project safely.', cta: 'Get Started' },
-  }[lang];
+    title: 'جاهز للبدء؟',
+    sub: 'انطلق الآن عبر واتساب وابدأ مشروعك بأمان.',
+    cta: 'ابدأ الآن'
+  };
 
   return (
     <section className="container py-20 text-center">

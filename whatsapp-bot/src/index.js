@@ -6,11 +6,14 @@ import { webhookRouter } from './routes/webhook.js';
 import { healthRouter } from './routes/health.js';
 import { myfatoorahRouter } from './routes/myfatoorah.js';
 import { paymentExpirationService } from './services/paymentExpirationService.js';
+// REMOVED: DatabaseInitializer import
 import { errorHandler } from './middleware/errorHandler.js';
 import { logger } from './utils/logger.js';
 
 // Load environment variables
 dotenv.config();
+
+// REMOVED: Database initialization function
 
 // Initialize Express app
 const app = express();
@@ -45,10 +48,12 @@ app.get('/', (req, res) => {
 app.use(errorHandler);
 
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   logger.info(`🚀 Server is running on port ${PORT}`);
   logger.info(`🤖 WhatsApp Gemini Chatbot is ready!`);
   logger.info(`📍 Webhook URL: http://localhost:${PORT}/webhook`);
+  
+  // REMOVED: Database initialization
   
   // Start payment expiration service
   try {

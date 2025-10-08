@@ -47,7 +47,7 @@ const Index = () => {
     return () => {
       if (el) el.remove();
     };
-  }, [lang]);
+  }, []);
 
   return (
     <div className="font-tajawal">

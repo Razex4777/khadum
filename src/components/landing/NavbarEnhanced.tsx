@@ -132,13 +132,19 @@ const NavbarEnhanced = () => {
               variant="outline"
               size={isScrolled ? "sm" : "default"}
               className={`
-                gap-2 border-primary/30 text-primary hover:bg-primary hover:text-white
-                transition-all hover-lift hidden sm:inline-flex
+                gap-2 border-[#25D366]/30 bg-gradient-to-r from-[#25D366]/5 to-[#128C7E]/5
+                text-[#075E54] hover:bg-gradient-to-r hover:from-[#25D366] hover:to-[#128C7E] 
+                hover:text-white hover:border-[#25D366]
+                transition-all duration-300 hover-lift hidden sm:inline-flex shadow-sm hover:shadow-lg
                 ${isScrolled ? 'px-3' : 'px-4'}
               `}
               onClick={handleWhatsAppClick}
             >
-              <MessageCircle className={isScrolled ? "w-3.5 h-3.5" : "w-4 h-4"} />
+              <img 
+                src="/whatsapp-logo.svg" 
+                alt="WhatsApp" 
+                className={`${isScrolled ? "w-4 h-4" : "w-5 h-5"} transition-all`}
+              />
               <span className={isScrolled ? "hidden lg:inline" : ""}>
                 {labels.whatsapp}
               </span>

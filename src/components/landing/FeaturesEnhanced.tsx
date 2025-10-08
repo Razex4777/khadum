@@ -77,7 +77,7 @@ const FeaturesEnhanced = () => {
             return (
               <Card
                 key={i}
-                className="relative overflow-hidden hover-lift hover-glow shadow-elevated group border-2 hover:border-primary/30 transition-all duration-300"
+                className="relative overflow-hidden hover-card shadow-elevated group border-2 hover:border-primary/30 transition-all duration-500 cursor-pointer"
                 style={{ animationDelay: `${i * 150}ms` }}
               >
                 <div className={`absolute top-0 right-0 w-32 h-32 ${feature.bgColor} rounded-bl-full opacity-50 group-hover:opacity-70 transition-opacity`} />

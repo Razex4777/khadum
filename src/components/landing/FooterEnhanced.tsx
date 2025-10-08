@@ -85,15 +85,19 @@ const FooterEnhanced = () => {
 
               {/* CTA Buttons */}
               <div className="flex flex-col sm:flex-row gap-3">
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  className="gap-2 border-white/30 bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm rounded-full"
-                  onClick={handleWhatsAppClick}
-                >
-                  <MessageCircle className="w-4 h-4" />
-                  واتساب
-                </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="gap-2 border-[#25D366]/50 bg-gradient-to-r from-[#25D366]/20 to-[#128C7E]/20 text-white hover:from-[#25D366] hover:to-[#128C7E] hover:border-[#25D366] backdrop-blur-sm rounded-full transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-[#25D366]/30"
+                onClick={handleWhatsAppClick}
+              >
+                <img 
+                  src="/whatsapp-logo.svg" 
+                  alt="WhatsApp" 
+                  className="w-4 h-4 brightness-0 invert"
+                />
+                واتساب
+              </Button>
                 <Button 
                   size="sm"
                   className="gap-2 bg-white text-primary hover:bg-white/90 rounded-full"

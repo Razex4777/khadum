@@ -2,6 +2,37 @@
 
 All notable changes to the Khadum project will be documented in this file.
 
+## 2025-10-08 13:15
+
+### 🔧 Vercel Deployment Configuration Fix
+
+#### 🚨 Build Error Resolution
+- **Issue**: Vercel build failing with `EISDIR: illegal operation on a directory, read` error
+- **Root Cause**: Deprecated `builds` configuration in `vercel.json` causing Vite build conflicts
+- **Error Location**: `file: /vercel/path0/index.html` - Vite unable to read index.html file
+
+#### ✅ Configuration Update
+- **Removed**: Deprecated `"builds"` configuration with `@vercel/static-build`
+- **Added**: Modern Vercel configuration with explicit commands:
+  - `"buildCommand": "npm run build"`
+  - `"outputDirectory": "dist"`
+  - `"installCommand": "npm install"`
+  - `"framework": null` (let Vercel auto-detect)
+- **Preserved**: SPA routing configuration for client-side routing
+
+#### 📤 Changes Pushed
+- **Commit**: `2250b3d` - fix: update vercel.json to use modern configuration format
+- **Files Changed**: 1 file, 4 insertions(+), 3 deletions(-)
+- **Status**: Successfully pushed to GitHub repository
+
+#### 🎯 Expected Results
+- ✅ **Build Fix**: Modern configuration should resolve Vite build errors
+- ✅ **Auto-Detection**: Vercel will properly detect Vite React app
+- ✅ **SPA Routing**: Client-side routing preserved for React Router
+- ✅ **Clean Deployment**: No more deprecated configuration warnings
+
+---
+
 ## 2025-10-08 12:57
 
 ### 🚀 GitHub Repository Setup & Code Push

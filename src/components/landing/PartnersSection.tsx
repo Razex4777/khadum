@@ -66,7 +66,7 @@ const PartnersSection = () => {
           <div>
             <div className="text-2xl font-bold text-foreground">200+</div>
             <div className="text-sm text-muted-foreground">
-              {lang === 'ar' ? 'شركة' : 'Companies'}
+              شركة
             </div>
           </div>
         </div>
@@ -78,7 +78,7 @@ const PartnersSection = () => {
           <div>
             <div className="text-2xl font-bold text-foreground">500+</div>
             <div className="text-sm text-muted-foreground">
-              {lang === 'ar' ? 'عميل راضي' : 'Happy Clients'}
+              عميل راضي
             </div>
           </div>
         </div>
@@ -90,7 +90,7 @@ const PartnersSection = () => {
           <div>
             <div className="text-2xl font-bold text-foreground">15+</div>
             <div className="text-sm text-muted-foreground">
-              {lang === 'ar' ? 'مجال' : 'Industries'}
+              مجال
             </div>
           </div>
         </div>

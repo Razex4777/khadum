@@ -1,7 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import ExpandableSidebar from '@/components/dashboard/ExpandableSidebar';
 import VerificationPending from '@/components/VerificationPending';
-import { NotificationProvider } from '@/contexts/NotificationContext';
 import { useVerificationGuard } from '@/hooks/useVerificationGuard';
 
 const DashboardLayout = () => {
@@ -52,11 +51,9 @@ const DashboardLayout = () => {
 
   // Verified user - show normal dashboard
   return (
-    <NotificationProvider freelancerId={freelancerData.id}>
-      <ExpandableSidebar>
-        <Outlet />
-      </ExpandableSidebar>
-    </NotificationProvider>
+    <ExpandableSidebar>
+      <Outlet />
+    </ExpandableSidebar>
   );
 };
 

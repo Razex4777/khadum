@@ -7,7 +7,6 @@ import {
   Settings, 
   LogOut, 
   ChevronRight,
-  Bell,
   Briefcase,
   Star,
   MessageCircle,
@@ -18,7 +17,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { useNotifications } from '@/contexts/NotificationContext';
 import { cn } from '@/lib/utils';
 
 interface SidebarItem {
@@ -51,14 +49,7 @@ const sidebarItems: SidebarItem[] = [
     path: '/dashboard/projects',
     badge: 3
   },
-  {
-    id: 'conversations',
-    label: 'المحادثات',
-    icon: MessageCircle,
-    path: '/dashboard/conversations',
-    badge: 2,
-    isNew: true
-  },
+
   {
     id: 'reviews',
     label: 'التقييمات',
@@ -74,13 +65,6 @@ const sidebarItems: SidebarItem[] = [
 ];
 
 const bottomItems: SidebarItem[] = [
-  {
-    id: 'notifications',
-    label: 'الإشعارات',
-    icon: Bell,
-    path: '/dashboard/notifications'
-    // Badge will be handled dynamically with context
-  },
   {
     id: 'security',
     label: 'الأمان',
@@ -170,19 +154,6 @@ const ExpandableSidebar: React.FC<ExpandableSidebarProps> = ({ children }) => {
   const SidebarItem: React.FC<{ item: SidebarItem; isBottom?: boolean }> = ({ item, isBottom = false }) => {
     const isActive = location.pathname === item.path;
     const Icon = item.icon;
-    
-    // Get notification count for notifications item
-    let notificationContext;
-    try {
-      notificationContext = useNotifications();
-    } catch {
-      // Not within notification context
-      notificationContext = null;
-    }
-    
-    const dynamicBadge = item.id === 'notifications' && notificationContext 
-      ? notificationContext.unreadCount 
-      : item.badge;
 
     return (
       <Button
@@ -202,8 +173,7 @@ const ExpandableSidebar: React.FC<ExpandableSidebarProps> = ({ children }) => {
             className={cn(
               "h-5 w-5 transition-all duration-300",
               isActive ? "text-primary" : "text-muted-foreground",
-              "group-hover:text-primary group-hover:scale-110",
-              item.id === 'notifications' && dynamicBadge && dynamicBadge > 0 && "animate-pulse"
+              "group-hover:text-primary group-hover:scale-110"
             )} 
           />
         </div>
@@ -226,14 +196,12 @@ const ExpandableSidebar: React.FC<ExpandableSidebarProps> = ({ children }) => {
                 جديد
               </Badge>
             )}
-            {dynamicBadge && dynamicBadge > 0 && (
+            {item.badge && item.badge > 0 && (
               <Badge className={cn(
                 "text-xs min-w-[20px] h-5 flex items-center justify-center px-1",
-                item.id === 'notifications' 
-                  ? "bg-red-500/20 text-red-400 border-red-500/30 animate-pulse"
-                  : "bg-primary/20 text-primary border-primary/30"
+                "bg-primary/20 text-primary border-primary/30"
               )}>
-                {dynamicBadge > 99 ? '99+' : dynamicBadge}
+                {item.badge > 99 ? '99+' : item.badge}
               </Badge>
             )}
           </div>

@@ -29,7 +29,8 @@ import {
   Save,
   X,
   Tag,
-  Star
+  Star,
+  Briefcase
 } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 
@@ -313,18 +314,26 @@ const Projects = () => {
   const popularTags = availableTags.filter(tag => tag.usage_count && tag.usage_count > 0).slice(0, 10)
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-primary-ultra-light p-6 relative overflow-hidden">
+      {/* Animated Background Effects */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent pointer-events-none" />
+      <div className="absolute top-0 left-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl animate-pulse" />
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-primary/3 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+      
+      <div className="relative z-10 max-w-7xl mx-auto space-y-6">
+        {/* Enhanced Header */}
+        <div className="flex items-center justify-between animate-in slide-in-from-top duration-700">
           <div>
-            <h1 className="text-3xl font-bold text-foreground accent-text">معرض المشاريع</h1>
-            <p className="text-muted-foreground">إدارة وعرض أعمالك ومشاريعك السابقة</p>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-primary-dark to-primary bg-clip-text text-transparent mb-2 flex items-center gap-3">
+              <Briefcase className="w-8 h-8 text-primary" />
+              معرض المشاريع
+            </h1>
+            <p className="text-lg text-muted-foreground">إدارة وعرض أعمالك ومشاريعك السابقة</p>
           </div>
           <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
             <DialogTrigger asChild>
-              <Button onClick={resetForm} className="bg-primary hover:bg-primary/90">
-                <Plus className="w-4 h-4 ml-2" />
+              <Button onClick={resetForm} className="bg-gradient-to-r from-primary to-primary-dark hover:from-primary-dark hover:to-primary text-white border-0 shadow-xl hover:shadow-2xl transition-all duration-300 h-12 px-6">
+                <Plus className="w-5 h-5 ml-2" />
                 إضافة مشروع جديد
               </Button>
             </DialogTrigger>
@@ -551,36 +560,36 @@ const Projects = () => {
           </Dialog>
         </div>
 
-        {/* Stats */}
-        <Card className="bg-card/80 backdrop-blur-xl border-border accent-ring">
+        {/* Enhanced Stats */}
+        <Card className="glass-card border-0 shadow-2xl animate-in slide-in-from-bottom duration-700">
           <CardContent className="p-6">
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-primary">{projects.length}</div>
-                <div className="text-sm text-muted-foreground">إجمالي المشاريع</div>
+              <div className="text-center p-4 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 hover:shadow-lg transition-all duration-300">
+                <div className="text-3xl font-bold bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent">{projects.length}</div>
+                <div className="text-sm text-muted-foreground font-medium">إجمالي المشاريع</div>
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-green-400">{projects.filter(p => p.is_featured).length}</div>
-                <div className="text-sm text-muted-foreground">المشاريع المميزة</div>
+              <div className="text-center p-4 rounded-xl bg-gradient-to-br from-yellow-500/10 to-orange-500/10 hover:shadow-lg transition-all duration-300">
+                <div className="text-3xl font-bold bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent">{projects.filter(p => p.is_featured).length}</div>
+                <div className="text-sm text-muted-foreground font-medium">المشاريع المميزة</div>
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-400">{projects.reduce((sum, p) => sum + (p.view_count || 0), 0)}</div>
-                <div className="text-sm text-muted-foreground">إجمالي المشاهدات</div>
+              <div className="text-center p-4 rounded-xl bg-gradient-to-br from-blue-500/10 to-cyan-500/10 hover:shadow-lg transition-all duration-300">
+                <div className="text-3xl font-bold bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">{projects.reduce((sum, p) => sum + (p.view_count || 0), 0)}</div>
+                <div className="text-sm text-muted-foreground font-medium">إجمالي المشاهدات</div>
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-purple-400">{availableTags.length}</div>
-                <div className="text-sm text-muted-foreground">المهارات المستخدمة</div>
+              <div className="text-center p-4 rounded-xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 hover:shadow-lg transition-all duration-300">
+                <div className="text-3xl font-bold bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">{availableTags.length}</div>
+                <div className="text-sm text-muted-foreground font-medium">المهارات المستخدمة</div>
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-yellow-400">{projects.reduce((sum, p) => sum + (p.likes_count || 0), 0)}</div>
-                <div className="text-sm text-muted-foreground">إجمالي الإعجابات</div>
+              <div className="text-center p-4 rounded-xl bg-gradient-to-br from-green-500/10 to-emerald-500/10 hover:shadow-lg transition-all duration-300">
+                <div className="text-3xl font-bold bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent">{projects.reduce((sum, p) => sum + (p.likes_count || 0), 0)}</div>
+                <div className="text-sm text-muted-foreground font-medium">إجمالي الإعجابات</div>
               </div>
             </div>
           </CardContent>
         </Card>
 
         {/* Search & Filters */}
-        <Card className="bg-card/80 backdrop-blur-xl border-border accent-ring">
+        <Card className="glass-card border-0 shadow-2xl animate-in slide-in-from-left duration-700">
           <CardContent className="p-4">
             <div className="flex flex-col md:flex-row gap-4 items-center">
               <div className="flex-1 relative">
@@ -614,7 +623,7 @@ const Projects = () => {
 
         {/* Popular Tags Filter */}
         {popularTags.length > 0 && (
-          <Card className="bg-card/80 backdrop-blur-xl border-border accent-ring">
+          <Card className="glass-card border-0 shadow-2xl animate-in slide-in-from-right duration-700">
             <CardHeader>
               <CardTitle className="text-foreground flex items-center gap-2">
                 <Tag className="w-5 h-5" />
@@ -652,7 +661,7 @@ const Projects = () => {
         )}
 
         {/* Projects List */}
-        <Card className="bg-card/80 backdrop-blur-xl border-border accent-ring">
+        <Card className="glass-card border-0 shadow-2xl animate-in slide-in-from-bottom duration-700">
           <CardHeader>
             <CardTitle className="text-foreground">مشاريعي ({filteredProjects.length})</CardTitle>
             <CardDescription>إدارة وتعديل المشاريع المضافة</CardDescription>
@@ -674,7 +683,7 @@ const Projects = () => {
             {viewMode === 'grid' ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredProjects.map(project => (
-                  <div key={project.id} className="border border-border rounded-lg overflow-hidden bg-card hover:shadow-lg transition-shadow">
+                  <div key={project.id} className="border-0 rounded-2xl overflow-hidden bg-white shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-500">
                     {/* Project Image */}
                     <div className="relative">
                       {project.thumbnail_url ? (

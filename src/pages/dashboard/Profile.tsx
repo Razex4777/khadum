@@ -46,7 +46,7 @@ interface ProfileData {
 
 const Profile = () => {
   const [profileData, setProfileData] = useState<ProfileData>({
-    displayName: 'أحمد محمد',
+    displayName: '',
     bio: 'مطور ويب متخصص في React و Node.js مع أكثر من 5 سنوات خبرة في تطوير التطبيقات الحديثة والمتجاوبة',
     title: 'مطور ويب متقدم',
     location: 'الرياض، السعودية',
@@ -240,35 +240,40 @@ const Profile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      {/* Background Effects */}
-      <div className="absolute inset-0" style={{ backgroundImage: 'var(--gradient-hero)' }}></div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-primary-ultra-light p-6 relative overflow-hidden">
+      {/* Animated Background Effects */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent pointer-events-none" />
+      <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl animate-pulse" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-primary/3 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
       
       <div className="relative z-10 max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        {/* Enhanced Header */}
+        <div className="flex items-center justify-between mb-8 animate-in slide-in-from-top duration-700">
           <div>
-            <h1 className="text-3xl font-bold text-foreground accent-text">الملف الشخصي</h1>
-            <p className="text-muted-foreground">إدارة معلوماتك الشخصية والمهنية</p>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-primary-dark to-primary bg-clip-text text-transparent mb-2 flex items-center gap-3">
+              <Award className="w-8 h-8 text-primary" />
+              الملف الشخصي
+            </h1>
+            <p className="text-lg text-muted-foreground">إدارة معلوماتك الشخصية والمهنية</p>
           </div>
           <div className="flex items-center gap-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-primary">{profileCompletion}%</div>
-              <div className="text-xs text-muted-foreground">اكتمال الملف</div>
+            <div className="text-center p-4 bg-gradient-to-br from-primary/10 to-primary/5 rounded-2xl border border-primary/20 shadow-lg">
+              <div className="text-3xl font-bold bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent">{profileCompletion}%</div>
+              <div className="text-xs text-muted-foreground font-semibold">اكتمال الملف</div>
             </div>
             <Button
               onClick={() => isEditing ? handleSave() : setIsEditing(true)}
-              className="bg-primary hover:bg-primary/90"
+              className="bg-gradient-to-r from-primary to-primary-dark hover:from-primary-dark hover:to-primary text-white border-0 shadow-xl hover:shadow-2xl transition-all duration-300 h-12 px-6"
               disabled={isSaving}
             >
               {isEditing ? (
                 <>
-                  <Save className="w-4 h-4 ml-2" />
+                  <Save className="w-5 h-5 ml-2" />
                   حفظ التغييرات
                 </>
               ) : (
                 <>
-                  <Button className="w-4 h-4 ml-2" />
+                  <Shield className="w-5 h-5 ml-2" />
                   تعديل الملف
                 </>
               )}
@@ -278,9 +283,9 @@ const Profile = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column - Profile Overview */}
-          <div className="lg:col-span-1 space-y-6">
+          <div className="lg:col-span-1 space-y-6 animate-in slide-in-from-left duration-700">
             {/* Profile Picture & Cover */}
-            <Card className="bg-card/80 backdrop-blur-xl border-border accent-ring">
+            <Card className="glass-card border-0 shadow-2xl hover:shadow-primary/10 transition-all duration-500 hover:-translate-y-1">
               <CardContent className="p-6">
                 {/* Cover Image */}
                 <div className="relative h-32 bg-gradient-to-r from-primary/20 to-primary/10 rounded-lg mb-4 overflow-hidden">
@@ -416,10 +421,12 @@ const Profile = () => {
             </Card>
 
             {/* Quick Stats */}
-            <Card className="bg-card/80 backdrop-blur-xl border-border accent-ring">
+            <Card className="glass-card border-0 shadow-2xl hover:shadow-primary/10 transition-all duration-500 hover:-translate-y-1">
               <CardHeader>
-                <CardTitle className="text-foreground flex items-center gap-2">
-                  <Star className="w-5 h-5 text-primary" />
+                <CardTitle className="text-foreground flex items-center gap-2 text-lg">
+                  <div className="p-2 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-xl">
+                    <Star className="w-5 h-5 text-white" />
+                  </div>
                   إحصائيات سريعة
                 </CardTitle>
               </CardHeader>
@@ -441,9 +448,9 @@ const Profile = () => {
           </div>
 
           {/* Right Column - Detailed Information */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-6 animate-in slide-in-from-right duration-700">
             {/* Bio Section */}
-            <Card className="bg-card/80 backdrop-blur-xl border-border accent-ring">
+            <Card className="glass-card border-0 shadow-2xl hover:shadow-primary/10 transition-all duration-500">
               <CardHeader>
                 <CardTitle className="text-foreground">نبذة شخصية</CardTitle>
                 <CardDescription>اكتب نبذة موجزة عن خبراتك ومهاراتك</CardDescription>
@@ -474,10 +481,12 @@ const Profile = () => {
             </Card>
 
             {/* Professional Details */}
-            <Card className="bg-card/80 backdrop-blur-xl border-border accent-ring">
+            <Card className="glass-card border-0 shadow-2xl hover:shadow-primary/10 transition-all duration-500">
               <CardHeader>
-                <CardTitle className="text-foreground flex items-center gap-2">
-                  <Briefcase className="w-5 h-5 text-primary" />
+                <CardTitle className="text-foreground flex items-center gap-2 text-lg">
+                  <div className="p-2 bg-gradient-to-br from-primary to-primary-dark rounded-xl">
+                    <Briefcase className="w-5 h-5 text-white" />
+                  </div>
                   التفاصيل المهنية
                 </CardTitle>
               </CardHeader>
@@ -575,10 +584,12 @@ const Profile = () => {
             </Card>
 
             {/* Skills */}
-            <Card className="bg-card/80 backdrop-blur-xl border-border accent-ring">
+            <Card className="glass-card border-0 shadow-2xl hover:shadow-primary/10 transition-all duration-500">
               <CardHeader>
-                <CardTitle className="text-foreground flex items-center gap-2">
-                  <Award className="w-5 h-5 text-primary" />
+                <CardTitle className="text-foreground flex items-center gap-2 text-lg">
+                  <div className="p-2 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl">
+                    <Award className="w-5 h-5 text-white" />
+                  </div>
                   المهارات
                 </CardTitle>
               </CardHeader>

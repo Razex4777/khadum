@@ -1,12 +1,16 @@
 import { useEffect, useState } from 'react';
-import Navbar from '@/components/landing/Navbar';
-import Hero from '@/components/landing/Hero';
-import Features from '@/components/landing/Features';
-import HowItWorks from '@/components/landing/HowItWorks';
+import NavbarEnhanced from '@/components/landing/NavbarEnhanced';
+import HeroEnhanced from '@/components/landing/HeroEnhanced';
+import StatisticsSection from '@/components/landing/StatisticsSection';
+import FeaturesEnhanced from '@/components/landing/FeaturesEnhanced';
+import HowItWorksEnhanced from '@/components/landing/HowItWorksEnhanced';
+import PricingSection from '@/components/landing/PricingSection';
+import TestimonialsSection from '@/components/landing/TestimonialsSection';
+import PartnersSection from '@/components/landing/PartnersSection';
 import FeaturedGrid from '@/components/landing/FeaturedGrid';
 import FAQSection from '@/components/landing/FAQSection';
 import CTASection from '@/components/landing/CTASection';
-import Footer from '@/components/landing/Footer';
+import FooterEnhanced from '@/components/landing/FooterEnhanced';
 
 const Index = () => {
   const [lang, setLang] = useState<'ar' | 'en'>('ar');
@@ -54,16 +58,28 @@ const Index = () => {
 
   return (
     <div className="font-tajawal">
-      <Navbar lang={lang} onToggleLang={() => setLang((l) => (l === 'ar' ? 'en' : 'ar'))} />
-      <main>
-        <Hero lang={lang} />
-        <Features lang={lang} />
-        <HowItWorks lang={lang} />
+      <NavbarEnhanced lang={lang} onToggleLang={() => setLang((l) => (l === 'ar' ? 'en' : 'ar'))} />
+      <main className="overflow-hidden">
+        <HeroEnhanced lang={lang} />
+        <div id="statistics">
+          <StatisticsSection lang={lang} />
+        </div>
+        <div id="features">
+          <FeaturesEnhanced lang={lang} />
+        </div>
+        <HowItWorksEnhanced lang={lang} />
+        <div id="pricing">
+          <PricingSection lang={lang} />
+        </div>
+        <div id="testimonials">
+          <TestimonialsSection lang={lang} />
+        </div>
+        <PartnersSection lang={lang} />
         <FeaturedGrid lang={lang} />
         <FAQSection lang={lang} />
         <CTASection lang={lang} />
       </main>
-      <Footer />
+      <FooterEnhanced />
     </div>
   );
 };

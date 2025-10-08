@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { MessageCircle, UserPlus } from "lucide-react";
-import ThemeToggle from "@/components/ThemeToggle";
 
 interface NavbarProps {
   lang: 'ar' | 'en';
@@ -53,7 +52,6 @@ const Navbar = ({ lang, onToggleLang }: NavbarProps) => {
           <Badge className="accent-ring hover-lift" aria-label="متاح الآن">متاح الآن</Badge>
         </div>
         <div className="flex items-center gap-2">
-          <ThemeToggle />
           <Button 
             variant="outline" 
             className="hover-lift hidden sm:inline-flex gap-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground"

@@ -1,17 +1,17 @@
 interface FeaturedGridProps { lang: 'ar' | 'en'; }
 
 const data = [
-  { name: 'سارة', role: 'مصممة UI/UX', rating: 4.9 },
-  { name: 'علي', role: 'مطور واجهات', rating: 4.8 },
-  { name: 'منى', role: 'كاتبة محتوى', rating: 4.7 },
-  { name: 'خالد', role: 'مسوّق رقمي', rating: 4.6 },
+  { name: 'مصمم 1', role: 'مصمم UI/UX', rating: 4.9 },
+  { name: 'مطور 1', role: 'مطور واجهات', rating: 4.8 },
+  { name: 'كاتب 1', role: 'كاتب محتوى', rating: 4.7 },
+  { name: 'مسوق 1', role: 'مسوّق رقمي', rating: 4.6 },
 ];
 
 const dataEn = [
-  { name: 'Sara', role: 'UI/UX Designer', rating: 4.9 },
-  { name: 'Ali', role: 'Frontend Dev', rating: 4.8 },
-  { name: 'Mona', role: 'Content Writer', rating: 4.7 },
-  { name: 'Khaled', role: 'Digital Marketer', rating: 4.6 },
+  { name: 'Designer 1', role: 'UI/UX Designer', rating: 4.9 },
+  { name: 'Developer 1', role: 'Frontend Dev', rating: 4.8 },
+  { name: 'Writer 1', role: 'Content Writer', rating: 4.7 },
+  { name: 'Marketer 1', role: 'Digital Marketer', rating: 4.6 },
 ];
 
 const FeaturedGrid = ({ lang }: FeaturedGridProps) => {

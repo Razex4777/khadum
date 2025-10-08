@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { PhoneInput, validatePhoneNumber } from "@/components/ui/phone-input";
+import { PhoneInput, validatePhoneNumber, countries } from "@/components/ui/phone-input";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
 import { useNavigate } from "react-router-dom";
@@ -19,6 +19,7 @@ interface FreelancerFormData {
   whatsapp_number: string;
   field: string;
   country_code: string;
+  phone_dial_code: string;
 }
 
 // Validation rules interface
@@ -48,7 +49,8 @@ const Register = () => {
     email: '',
     whatsapp_number: '',
     field: '',
-    country_code: 'SA'
+    country_code: 'SA',
+    phone_dial_code: '966'
   });
 
   const [selectedMainCategory, setSelectedMainCategory] = useState('');
@@ -284,6 +286,8 @@ const Register = () => {
             email: freelancerData.email,
             whatsapp_number: freelancerData.whatsapp_number,
             field: freelancerData.field,
+            country_code: freelancerData.country_code,
+            phone_dial_code: freelancerData.phone_dial_code,
             is_verified: false
           }
         ])
@@ -397,7 +401,14 @@ const Register = () => {
                     value={freelancerData.whatsapp_number}
                     onChange={(value) => handleInputChange('whatsapp_number', value)}
                     countryCode={freelancerData.country_code}
-                    onCountryChange={(code) => setFreelancerData({...freelancerData, country_code: code})}
+                    onCountryChange={(code) => {
+                      const c = countries.find(c => c.code === code);
+                      setFreelancerData({
+                        ...freelancerData,
+                        country_code: code,
+                        phone_dial_code: (c?.dialCode || '+').replace('+','')
+                      });
+                    }}
                     language="ar"
                     required
                   />

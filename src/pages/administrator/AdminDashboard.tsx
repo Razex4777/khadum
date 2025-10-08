@@ -178,47 +178,65 @@ const AdminDashboard = () => {
     if (!admin) return null;
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 font-tajawal">
-            {/* Background Effects */}
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-red-900/20 via-slate-900 to-slate-900"></div>
+        <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-tajawal relative overflow-hidden">
+            {/* Enhanced Background Effects */}
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-slate-900 to-slate-950"></div>
+            <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl animate-pulse" />
+            <div className="absolute bottom-0 left-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
 
             <div className="relative z-10 flex">
-                {/* Sidebar */}
-                <div className="w-64 bg-slate-800/50 backdrop-blur-xl border-r border-slate-700/50 min-h-screen">
-                    <div className="p-6">
-                        <div className="flex items-center gap-3 mb-8">
-                            <Shield className="h-8 w-8 text-red-500" />
+                {/* Enhanced Premium Sidebar */}
+                <div className="w-72 bg-gradient-to-b from-slate-900/80 to-slate-950/80 backdrop-blur-2xl border-r border-primary/20 min-h-screen shadow-2xl relative">
+                    {/* Gradient Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent pointer-events-none" />
+                    
+                    <div className="relative z-10 p-6">
+                        {/* Logo Section */}
+                        <div className="flex items-center gap-3 mb-10 animate-in slide-in-from-right duration-500">
+                            <div className="h-12 w-12 bg-gradient-to-br from-primary to-primary-dark rounded-2xl flex items-center justify-center shadow-lg shadow-primary/50">
+                                <Shield className="h-7 w-7 text-white" />
+                            </div>
                             <div>
                                 <h1 className="text-xl font-bold text-white">لوحة الإدارة</h1>
-                                <p className="text-sm text-slate-400">خدوم</p>
+                                <p className="text-sm text-slate-400 flex items-center gap-1">
+                                    <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                                    خدوم - متصل
+                                </p>
                             </div>
                         </div>
 
+                        {/* Navigation */}
                         <div className="space-y-2">
                             <Button
                                 variant={activeSection === 'overview' ? 'default' : 'ghost'}
-                                className={`w-full justify-start ${activeSection === 'overview'
-                                    ? 'bg-red-600 hover:bg-red-700 text-white'
-                                    : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
-                                    }`}
+                                className={`w-full justify-start h-12 group transition-all duration-300 ${
+                                    activeSection === 'overview'
+                                        ? 'bg-gradient-to-r from-primary to-primary-dark hover:from-primary-dark hover:to-primary text-white shadow-lg shadow-primary/50'
+                                        : 'text-slate-300 hover:text-white hover:bg-slate-800/50 hover:border-primary/30'
+                                }`}
                                 onClick={() => setActiveSection('overview')}
                             >
-                                <BarChart3 className="h-4 w-4 mr-2" />
-                                الإحصائيات العامة
+                                <BarChart3 className={`h-5 w-5 mr-3 transition-transform group-hover:scale-110 ${
+                                    activeSection === 'overview' ? 'text-white' : ''
+                                }`} />
+                                <span className="font-medium">الإحصائيات العامة</span>
                             </Button>
 
                             <Button
                                 variant={activeSection === 'verification' ? 'default' : 'ghost'}
-                                className={`w-full justify-start ${activeSection === 'verification'
-                                    ? 'bg-red-600 hover:bg-red-700 text-white'
-                                    : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
-                                    }`}
+                                className={`w-full justify-start h-12 group transition-all duration-300 ${
+                                    activeSection === 'verification'
+                                        ? 'bg-gradient-to-r from-primary to-primary-dark hover:from-primary-dark hover:to-primary text-white shadow-lg shadow-primary/50'
+                                        : 'text-slate-300 hover:text-white hover:bg-slate-800/50 hover:border-primary/30'
+                                }`}
                                 onClick={() => setActiveSection('verification')}
                             >
-                                <UserCheck className="h-4 w-4 mr-2" />
-                                التحقق من المستخدمين
+                                <UserCheck className={`h-5 w-5 mr-3 transition-transform group-hover:scale-110 ${
+                                    activeSection === 'verification' ? 'text-white' : ''
+                                }`} />
+                                <span className="font-medium flex-1 text-right">التحقق من المستخدمين</span>
                                 {stats.pendingVerifications > 0 && (
-                                    <Badge className="mr-2 bg-orange-600 text-white">
+                                    <Badge className="mr-2 bg-gradient-to-r from-orange-500 to-red-500 text-white border-0 shadow-lg animate-pulse">
                                         {stats.pendingVerifications}
                                     </Badge>
                                 )}
@@ -226,33 +244,40 @@ const AdminDashboard = () => {
 
                             <Button
                                 variant={activeSection === 'whatsapp' ? 'default' : 'ghost'}
-                                className={`w-full justify-start ${activeSection === 'whatsapp'
-                                    ? 'bg-red-600 hover:bg-red-700 text-white'
-                                    : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
-                                    }`}
+                                className={`w-full justify-start h-12 group transition-all duration-300 ${
+                                    activeSection === 'whatsapp'
+                                        ? 'bg-gradient-to-r from-primary to-primary-dark hover:from-primary-dark hover:to-primary text-white shadow-lg shadow-primary/50'
+                                        : 'text-slate-300 hover:text-white hover:bg-slate-800/50 hover:border-primary/30'
+                                }`}
                                 onClick={() => setActiveSection('whatsapp')}
                             >
-                                <MessageCircle className="h-4 w-4 mr-2" />
-                                WhatsApp Bot
+                                <MessageCircle className={`h-5 w-5 mr-3 transition-transform group-hover:scale-110 ${
+                                    activeSection === 'whatsapp' ? 'text-white' : ''
+                                }`} />
+                                <span className="font-medium">WhatsApp Bot</span>
                             </Button>
                         </div>
                     </div>
 
-                    <div className="absolute bottom-6 left-6 right-6">
-                        <div className="bg-slate-700/50 rounded-lg p-4 mb-4">
+                    {/* Admin Profile at Bottom */}
+                    <div className="absolute bottom-6 left-6 right-6 space-y-3">
+                        <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-xl rounded-2xl p-4 border border-primary/20 shadow-xl">
                             <div className="flex items-center gap-3">
-                                <div className="h-10 w-10 bg-red-600 rounded-full flex items-center justify-center">
-                                    <Shield className="h-5 w-5 text-white" />
+                                <div className="h-12 w-12 bg-gradient-to-br from-primary to-primary-dark rounded-full flex items-center justify-center shadow-lg shadow-primary/30 animate-pulse">
+                                    <Shield className="h-6 w-6 text-white" />
                                 </div>
-                                <div>
-                                    <p className="text-white font-medium">{admin.full_name}</p>
-                                    <p className="text-slate-400 text-sm">{admin.role}</p>
+                                <div className="flex-1">
+                                    <p className="text-white font-semibold text-sm">{admin.full_name}</p>
+                                    <p className="text-slate-400 text-xs flex items-center gap-1">
+                                        <span className="w-1.5 h-1.5 bg-green-500 rounded-full" />
+                                        {admin.role}
+                                    </p>
                                 </div>
                             </div>
                         </div>
                         <Button
                             variant="outline"
-                            className="w-full border-slate-600 text-slate-300 hover:bg-slate-700/50"
+                            className="w-full border-slate-700 bg-slate-800/50 text-slate-300 hover:bg-red-600 hover:text-white hover:border-red-500 transition-all duration-300 h-11"
                             onClick={handleLogout}
                         >
                             <LogOut className="h-4 w-4 mr-2" />
@@ -265,59 +290,74 @@ const AdminDashboard = () => {
                 <div className="flex-1 p-8">
                     {activeSection === 'overview' && (
                         <div className="space-y-6">
-                            <div className="flex items-center justify-between">
-                                <h2 className="text-3xl font-bold text-white">الإحصائيات العامة</h2>
-                                <Badge className="bg-red-600/20 text-red-400 border-red-500/30">
+                            <div className="flex items-center justify-between animate-in slide-in-from-top duration-500">
+                                <div>
+                                    <h2 className="text-4xl font-bold text-white mb-2">الإحصائيات العامة</h2>
+                                    <p className="text-slate-400">نظرة شاملة على المنصة</p>
+                                </div>
+                                <Badge className="bg-gradient-to-r from-primary to-primary-dark text-white border-0 px-4 py-2 shadow-lg shadow-primary/50 animate-pulse">
+                                    <span className="w-2 h-2 bg-white rounded-full mr-2 inline-block" />
                                     تحديث مباشر
                                 </Badge>
                             </div>
 
-                            {/* Stats Cards */}
+                            {/* Enhanced Stats Cards */}
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                <Card className="bg-slate-800/50 backdrop-blur-xl border-slate-700/50">
-                                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                        <CardTitle className="text-sm font-medium text-slate-300">إجمالي المستخدمين</CardTitle>
-                                        <Users className="h-4 w-4 text-blue-500" />
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="text-2xl font-bold text-white">{stats.totalUsers}</div>
-                                        <p className="text-xs text-slate-400">مستخدم مسجل</p>
-                                    </CardContent>
-                                </Card>
-
-                                <Card className="bg-slate-800/50 backdrop-blur-xl border-slate-700/50">
-                                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                        <CardTitle className="text-sm font-medium text-slate-300">العملاء</CardTitle>
-                                        <Briefcase className="h-4 w-4 text-green-500" />
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="text-2xl font-bold text-white">{stats.totalClients}</div>
-                                        <p className="text-xs text-slate-400">عميل مسجل</p>
-                                    </CardContent>
-                                </Card>
-
-                                <Card className="bg-slate-800/50 backdrop-blur-xl border-slate-700/50">
-                                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                        <CardTitle className="text-sm font-medium text-slate-300">المستقلون</CardTitle>
-                                        <TrendingUp className="h-4 w-4 text-purple-500" />
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="text-2xl font-bold text-white">{stats.totalFreelancers}</div>
-                                        <p className="text-xs text-slate-400">مستقل مسجل</p>
-                                    </CardContent>
-                                </Card>
-
-                                <Card className="bg-slate-800/50 backdrop-blur-xl border-slate-700/50">
-                                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                        <CardTitle className="text-sm font-medium text-slate-300">في انتظار التحقق</CardTitle>
-                                        <Clock className="h-4 w-4 text-orange-500" />
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="text-2xl font-bold text-white">{stats.pendingVerifications}</div>
-                                        <p className="text-xs text-slate-400">مستخدم معلق</p>
-                                    </CardContent>
-                                </Card>
-                            </div>
+                                {[
+                                    { 
+                                        label: "إجمالي المستخدمين", 
+                                        value: stats.totalUsers, 
+                                        subtitle: "مستخدم مسجل", 
+                                        icon: Users, 
+                                        gradient: "from-blue-500 to-cyan-500",
+                                        bgGradient: "from-blue-500/10 to-cyan-500/10"
+                                    },
+                                    { 
+                                        label: "العملاء", 
+                                        value: stats.totalClients, 
+                                        subtitle: "عميل نشط", 
+                                        icon: Briefcase, 
+                                        gradient: "from-green-500 to-emerald-500",
+                                        bgGradient: "from-green-500/10 to-emerald-500/10"
+                                    },
+                                    { 
+                                        label: "المستقلون", 
+                                        value: stats.totalFreelancers, 
+                                        subtitle: "مستقل محترف", 
+                                        icon: TrendingUp, 
+                                        gradient: "from-purple-500 to-pink-500",
+                                        bgGradient: "from-purple-500/10 to-pink-500/10"
+                                    },
+                                    { 
+                                        label: "في انتظار التحقق", 
+                                        value: stats.pendingVerifications, 
+                                        subtitle: "يحتاج مراجعة", 
+                                        icon: Clock, 
+                                        gradient: "from-orange-500 to-red-500",
+                                        bgGradient: "from-orange-500/10 to-red-500/10"
+                                    }
+                                ].map((stat, index) => (
+                                    <Card 
+                                        key={index}
+                                        className={`relative overflow-hidden bg-gradient-to-br ${stat.bgGradient} backdrop-blur-xl border-slate-700/50 hover:border-slate-600 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 animate-in slide-in-from-bottom`}
+                                        style={{ animationDelay: `${index * 100}ms` }}
+                                    >
+                                        <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${stat.gradient} opacity-10 rounded-full -mr-16 -mt-16`} />
+                                        <CardHeader className="flex flex-row items-center justify-between pb-2">
+                                            <CardTitle className="text-sm font-medium text-slate-300">{stat.label}</CardTitle>
+                                            <div className={`p-3 rounded-xl bg-gradient-to-br ${stat.gradient} shadow-lg`}>
+                                                <stat.icon className="h-5 w-5 text-white" />
+                                            </div>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <div className="text-4xl font-bold text-white mb-1">{stat.value}</div>
+                                            <p className="text-xs text-slate-400 flex items-center gap-1">
+                                                <TrendingUp className="w-3 h-3" />
+                                                {stat.subtitle}
+                                            </p>
+                                        </CardContent>
+                                    </Card>
+                                ))}</div>
 
                             {/* Additional Info */}
                             <Card className="bg-slate-800/50 backdrop-blur-xl border-slate-700/50">

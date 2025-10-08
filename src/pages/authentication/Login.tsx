@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, MessageCircle, Briefcase } from "lucide-react";
+import { ArrowLeft, MessageCircle, Briefcase, Mail } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
@@ -22,7 +22,7 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      // Validate email format
+      // Email login validation
       if (!email.includes('@')) {
         throw new Error('يرجى إدخال بريد إلكتروني صحيح');
       }
@@ -31,9 +31,9 @@ const Login = () => {
         throw new Error('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
       }
 
-      console.log('🔐 Attempting login with email:', email);
+      console.log('🔐 Attempting email login:', email);
 
-      // Sign in with Supabase Auth
+      // Sign in with Supabase Auth (email/password)
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email: email,
         password: password,
@@ -42,7 +42,6 @@ const Login = () => {
       if (authError) {
         console.error('Auth error:', authError);
         
-        // Handle specific auth errors
         if (authError.message.includes('Invalid login credentials')) {
           throw new Error('البريد الإلكتروني أو كلمة المرور غير صحيحة');
         } else if (authError.message.includes('Email not confirmed')) {
@@ -56,8 +55,6 @@ const Login = () => {
         throw new Error('فشل في تسجيل الدخول');
       }
 
-      console.log('✅ Auth successful, checking freelancer record...');
-
       // Check if this email exists in freelancers table
       const { data: freelancer, error: freelancerError } = await supabase
         .from('freelancers')
@@ -66,19 +63,17 @@ const Login = () => {
         .single();
 
       if (freelancerError || !freelancer) {
-        // Sign out if not a freelancer
         await supabase.auth.signOut();
         throw new Error('هذا الحساب غير مسجل كمستقل في النظام');
       }
 
-      console.log('✅ Freelancer record found:', freelancer.full_name);
+      console.log('✅ Auth successful, freelancer found:', freelancer.full_name);
 
       toast({
         title: "تم تسجيل الدخول بنجاح",
         description: `مرحباً ${freelancer.full_name}`,
       });
 
-      // Navigate to dashboard (verification guard will handle the rest)
       navigate('/dashboard');
       
     } catch (error: any) {
@@ -161,7 +156,7 @@ const Login = () => {
                   className="w-full bg-primary hover:bg-primary/90 text-primary-foreground hover-lift" 
                   disabled={isLoading}
                 >
-                  {isLoading ? "جاري تسجيل الدخول..." : "تسجيل الدخول كمستقل"}
+                  {isLoading ? "جاري تسجيل الدخول..." : "تسجيل الدخول"}
                 </Button>
               </form>
 

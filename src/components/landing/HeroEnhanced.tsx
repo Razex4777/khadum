@@ -107,16 +107,15 @@ const HeroEnhanced = () => {
 
           {/* Right: Interactive Calculator with Background */}
           <Card className="shadow-2xl border-0 overflow-hidden animate-slide-up relative">
-            {/* Background Image */}
-            <div 
-              className="absolute inset-0 opacity-5"
-              style={{
-                backgroundImage: 'url(/hero/hero_bg.webp)',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat'
-              }}
-            />
+            {/* SVG Background Pattern */}
+            <div className="absolute inset-0 opacity-100">
+              <img
+                src="/hero/khadum-hero-bg.svg"
+                alt=""
+                className="w-full h-full object-cover"
+                loading="eager"
+              />
+            </div>
             
             {/* Glass overlay for better readability */}
             <div className="absolute inset-0 bg-gradient-to-br from-white/95 via-white/90 to-primary-ultra-light/80 backdrop-blur-sm" />

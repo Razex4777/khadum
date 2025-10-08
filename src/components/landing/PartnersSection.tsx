@@ -3,39 +3,21 @@ import { Building2, Briefcase, Code, Palette, TrendingUp, Users, FileText, Camer
 
 const PartnersSection = () => {
   const t = {
-    ar: {
-      title: "شركاء النجاح",
-      subtitle: "انضم إلى مئات الشركات والعلامات التجارية التي تثق في خدوم",
-      partners: [
-        { name: "شركة التقنية الذكية", icon: Building2, category: "تقنية" },
-        { name: "وكالة التسويق الرقمي", icon: TrendingUp, category: "تسويق" },
-        { name: "ستوديو التصميم الإبداعي", icon: Palette, category: "تصميم" },
-        { name: "مجموعة المشاريع", icon: Briefcase, category: "أعمال" },
-        { name: "شركة البرمجيات", icon: Code, category: "برمجة" },
-        { name: "مكتب الاستشارات", icon: Users, category: "استشارات" },
-        { name: "دار النشر الرقمية", icon: FileText, category: "محتوى" },
-        { name: "ستوديو الإنتاج", icon: Camera, category: "إنتاج" },
-      ],
-      trustedBy: "موثوق به من قبل",
-      clients: "500+ عميل",
-    },
-    en: {
-      title: "Success Partners",
-      subtitle: "Join hundreds of companies and brands that trust Khadoom",
-      partners: [
-        { name: "Smart Tech Company", icon: Building2, category: "Technology" },
-        { name: "Digital Marketing Agency", icon: TrendingUp, category: "Marketing" },
-        { name: "Creative Design Studio", icon: Palette, category: "Design" },
-        { name: "Projects Group", icon: Briefcase, category: "Business" },
-        { name: "Software Company", icon: Code, category: "Development" },
-        { name: "Consulting Office", icon: Users, category: "Consulting" },
-        { name: "Digital Publishing House", icon: FileText, category: "Content" },
-        { name: "Production Studio", icon: Camera, category: "Production" },
-      ],
-      trustedBy: "Trusted by",
-      clients: "500+ Clients",
-    },
-  }[lang];
+    title: "شركاء النجاح",
+    subtitle: "انضم إلى مئات الشركات والعلامات التجارية التي تثق في خدوم",
+    partners: [
+      { name: "شركة التقنية الذكية", icon: Building2, category: "تقنية" },
+      { name: "وكالة التسويق الرقمي", icon: TrendingUp, category: "تسويق" },
+      { name: "ستوديو التصميم الإبداعي", icon: Palette, category: "تصميم" },
+      { name: "مجموعة المشاريع", icon: Briefcase, category: "أعمال" },
+      { name: "شركة البرمجيات", icon: Code, category: "برمجة" },
+      { name: "مكتب الاستشارات", icon: Users, category: "استشارات" },
+      { name: "دار النشر الرقمية", icon: FileText, category: "محتوى" },
+      { name: "ستوديو الإنتاج", icon: Camera, category: "إنتاج" },
+    ],
+    trustedBy: "موثوق به من قبل",
+    clients: "500+ عميل",
+  };
 
   return (
     <section className="container py-16 md:py-20 bg-muted/30">

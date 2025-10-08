@@ -103,19 +103,19 @@ const TestimonialsSection = () => {
         <div className="text-center">
           <div className="text-3xl font-bold text-primary">500+</div>
           <div className="text-sm text-muted-foreground">
-            {lang === 'ar' ? 'تقييم إيجابي' : 'Positive Reviews'}
+            تقييم إيجابي
           </div>
         </div>
         <div className="text-center">
           <div className="text-3xl font-bold text-primary">4.9/5</div>
           <div className="text-sm text-muted-foreground">
-            {lang === 'ar' ? 'متوسط التقييم' : 'Average Rating'}
+            متوسط التقييم
           </div>
         </div>
         <div className="text-center">
           <div className="text-3xl font-bold text-primary">98%</div>
           <div className="text-sm text-muted-foreground">
-            {lang === 'ar' ? 'نسبة الرضا' : 'Satisfaction Rate'}
+            نسبة الرضا
           </div>
         </div>
       </div>

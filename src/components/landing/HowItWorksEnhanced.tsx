@@ -2,11 +2,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MessageCircle, Search, UserCheck, Handshake, CreditCard, Star, ArrowRight } from "lucide-react";
 
-interface HowItWorksEnhancedProps { lang: 'ar' | 'en'; }
-
-const HowItWorksEnhanced = ({ lang }: HowItWorksEnhancedProps) => {
+const HowItWorksEnhanced = () => {
   const t = {
-    ar: {
       title: "كيف يعمل خدوم؟",
       subtitle: "عملية بسيطة وسريعة في 6 خطوات فقط",
       forClients: "للعملاء",
@@ -218,7 +215,7 @@ const HowItWorksEnhanced = ({ lang }: HowItWorksEnhancedProps) => {
         },
       ],
     },
-  }[lang];
+  };
 
   const renderTimeline = (steps: typeof t.clientSteps, title: string) => (
     <div className="mb-16">

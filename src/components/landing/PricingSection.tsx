@@ -117,7 +117,7 @@ const PricingSection = () => {
                   </div>
                   <div className="text-sm text-muted-foreground mt-1">
                     {plan.price === "TBA" 
-                      ? (lang === 'ar' ? 'قريباً' : 'Coming Soon')
+                      ? 'قريباً'
                       : t.monthly
                     }
                   </div>
@@ -161,10 +161,7 @@ const PricingSection = () => {
       {/* Commission Info */}
       <div className="mt-12 text-center">
         <p className="text-sm text-muted-foreground">
-          {lang === 'ar' 
-            ? '* تطبق الأسعار على المستقلين فقط. العملاء يستخدمون المنصة مجانًا'
-            : '* Prices apply to freelancers only. Clients use the platform for free'
-          }
+          * تطبق الأسعار على المستقلين فقط. العملاء يستخدمون المنصة مجانًا
         </p>
       </div>
     </section>

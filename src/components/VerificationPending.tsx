@@ -259,7 +259,7 @@ const VerificationPending: React.FC<VerificationPendingProps> = ({
                   </Badge>
                   <Badge variant="outline" className="bg-background/50">
                     <Phone className="w-3 h-3 ml-1" />
-                    +966 50 981 1981
+                    +966511809878
                   </Badge>
                 </div>
               </CardContent>

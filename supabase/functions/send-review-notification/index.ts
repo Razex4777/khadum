@@ -389,7 +389,7 @@ function generateEmailContent(full_name: string, status: 'approved' | 'rejected'
             </div>
             
             <div style="margin: 1rem 0;">
-                📞 <strong>الواتساب:</strong> <a href="https://wa.me/966509811981" style="color: #059669;">+966 50 981 1981</a><br>
+                📞 <strong>الواتساب:</strong> <a href="https://wa.me/966511809878" style="color: #059669;">+966511809878</a><br>
                 📧 <strong>البريد الإلكتروني:</strong> <a href="mailto:support@khadum.sa" style="color: #059669;">support@khadum.sa</a>
             </div>
         </div>

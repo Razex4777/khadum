@@ -1,0 +1,17 @@
+# robots.txt for Khadum - خدوم
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://www.khadum.app/sitemap.xml
+
+# Disallow sensitive areas
+Disallow: /admin-login
+Disallow: /api/
+Disallow: /_next/
+Disallow: /admin/
+
+# Allow search engines to crawl all public pages
+Allow: /
+Allow: /authentication/
+

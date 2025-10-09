@@ -13,23 +13,18 @@ khadum/
 │   └── 📄 project_structure.md       # Current architecture documentation
 │
 ├── 📁 src/                           # Source code
-│   ├── 📁 api/                       # API integration modules
 │   ├── 📁 components/                # React components
 │   │   ├── 📁 dashboard/             # Dashboard-specific components
 │   │   │   ├── 📄 ExpandableSidebar.tsx
 │   │   │   └── 📁 notifications/
 │   │   ├── 📁 landing/               # Landing page components
-│   │   │   ├── 📄 CTASection.tsx     # Call-to-action section
 │   │   │   ├── 📄 FAQSection.tsx     # FAQ section
 │   │   │   ├── 📄 FeaturedGrid.tsx   # Featured items grid
-│   │   │   ├── 📄 Features.tsx       # Features showcase (legacy)
 │   │   │   ├── 📄 FeaturesEnhanced.tsx   # Enhanced features with multiple layouts
 │   │   │   ├── 📄 Footer.tsx         # Page footer
-│   │   │   ├── 📄 Hero.tsx           # Hero section (legacy)
 │   │   │   ├── 📄 HeroEnhanced.tsx   # Enhanced hero with interactive calculator
-│   │   │   ├── 📄 HowItWorks.tsx     # How it works section (legacy)
 │   │   │   ├── 📄 HowItWorksEnhanced.tsx   # Enhanced with visual timeline
-│   │   │   ├── 📄 Navbar.tsx         # Navigation bar
+│   │   │   ├── 📄 NavbarEnhanced.tsx   # Enhanced navigation bar
 │   │   │   ├── 📄 PartnersSection.tsx      # Partner/client logos section
 │   │   │   ├── 📄 PricingSection.tsx       # Pricing/subscription section
 │   │   │   ├── 📄 StatisticsSection.tsx    # Statistics/trust metrics section
@@ -39,7 +34,6 @@ khadum/
 │   │   ├── 📄 ThemeToggle.tsx        # Theme switcher
 │   │   └── 📄 VerificationPending.tsx
 │   │
-│   ├── 📁 contexts/                  # React contexts
 │   ├── 📁 hooks/                     # Custom React hooks
 │   ├── 📁 lib/                       # Utility libraries and services
 │   │   ├── 📄 emailService.ts        # Email functionality
@@ -60,24 +54,29 @@ khadum/
 │   ├── 📄 main.tsx                   # App entry point
 │   └── 📄 index.css                  # Global styles
 │
-├── 📁 whatsapp-bot/                  # WhatsApp bot implementation
+├── 📁 whatsapp-bot/                  # WhatsApp bot implementation (NOW TRACKED IN GIT)
 │   ├── 📁 src/
-│   │   ├── 📁 commands/              # Bot commands
 │   │   ├── 📁 config/                # Bot configuration
 │   │   ├── 📁 controllers/           # Bot controllers
 │   │   ├── 📁 middleware/            # Bot middleware
 │   │   ├── 📁 routes/                # Bot routes
+│   │   │   ├── 📄 health.js          # Health check endpoint
+│   │   │   ├── 📄 myfatoorah.js      # Payment processing routes
+│   │   │   └── 📄 webhook.js         # Webhook handlers
 │   │   ├── 📁 services/              # Bot services
-│   │   │   ├── 📁 geminiservice/     # Gemini AI integration
-│   │   │   └── 📁 supabaseservice/   # Supabase integration
-│   │   └── 📁 utils/                 # Bot utilities
+│   │   │   ├── 📄 myfatoorahService.js   # MyFatoorah payment integration
+│   │   │   ├── 📄 paymentExpirationService.js  # Payment expiration logic
+│   │   │   └── 📄 whatsappService.js      # WhatsApp API integration
+│   │   ├── 📁 utils/                 # Bot utilities
+│   │   │   └── 📄 logger.js          # Logging functionality
+│   │   └── 📄 index.js               # Bot entry point
 │   └── 📄 package.json
 │
 ├── 📁 supabase/                      # Supabase backend
-│   ├── 📁 functions/                 # Edge functions
-│   └── 📁 migrations/                # Database migrations
+│   └── 📁 functions/                 # Edge functions
+│       └── 📁 send-review-notification/  # Email notification function
+│           └── 📄 index.ts           # Sends review approval/rejection emails
 │
-├── 📁 STMPs/                         # SMTP configurations
 ├── 📄 package.json                   # Project dependencies
 ├── 📄 tsconfig.json                  # TypeScript config
 ├── 📄 vite.config.ts                 # Vite config
@@ -109,9 +108,9 @@ khadum/
 
 ## 🌐 Landing Page Architecture
 
-The landing page (`src/pages/Index.tsx`) is composed of modular sections (10 total sections):
+The landing page (`src/pages/Index.tsx`) is composed of modular sections (11 total sections):
 
-1. **Navbar** - Navigation with language toggle and theme switcher
+1. **NavbarEnhanced** - Navigation with language toggle and theme switcher
 2. **HeroEnhanced** - Rich hero section with interactive calculator/form
    - Dual-tab interface (Cost Calculator & Freelancer Search)
    - Real-time cost estimation with sliders and selects
@@ -139,8 +138,7 @@ The landing page (`src/pages/Index.tsx`) is composed of modular sections (10 tot
    - Trust indicators (200+ companies, 500+ clients)
 9. **FeaturedGrid** - Featured items showcase
 10. **FAQSection** - Frequently asked questions
-11. **CTASection** - Final call-to-action
-12. **Footer** - Footer with links and information
+11. **Footer** - Footer with links and information
 
 ### Design System Enhancements
 - **Color Palette**: Rich teal/green inspired by esdaar.com

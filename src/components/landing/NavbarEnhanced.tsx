@@ -58,13 +58,13 @@ const NavbarEnhanced = () => {
 
   return (
     <header className={`
-      fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out
+      fixed top-0 left-0 right-0 z-[200] transition-all duration-500 ease-out
       ${isScrolled ? 'py-3' : 'py-4'}
     `}>
       <nav className={`
-        container mx-auto transition-all duration-500 ease-out
-        ${isScrolled 
-          ? 'max-w-5xl glass-card rounded-full shadow-floating border-glow px-6 py-3' 
+        container mx-auto transition-all duration-500 ease-out relative
+        ${isScrolled
+          ? 'max-w-5xl glass-card rounded-full shadow-floating border-glow px-6 py-3'
           : 'bg-white/80 backdrop-blur-md rounded-2xl border border-white/20 shadow-soft px-6 py-2'
         }
       `}>
@@ -98,7 +98,7 @@ const NavbarEnhanced = () => {
             <Button
               variant="ghost"
               size={isScrolled ? "sm" : "default"}
-              className="hover:bg-primary/10 hover:text-primary transition-colors"
+              className="hover:bg-primary/10 hover:text-primary transition-colors relative z-10"
               onClick={() => scrollToSection('features')}
             >
               {labels.features}
@@ -106,7 +106,7 @@ const NavbarEnhanced = () => {
             <Button
               variant="ghost"
               size={isScrolled ? "sm" : "default"}
-              className="hover:bg-primary/10 hover:text-primary transition-colors"
+              className="hover:bg-primary/10 hover:text-primary transition-colors relative z-10"
               onClick={() => scrollToSection('pricing')}
             >
               {labels.pricing}
@@ -114,7 +114,7 @@ const NavbarEnhanced = () => {
             <Button
               variant="ghost"
               size={isScrolled ? "sm" : "default"}
-              className="hover:bg-primary/10 hover:text-primary transition-colors"
+              className="hover:bg-primary/10 hover:text-primary transition-colors relative z-10"
               onClick={() => scrollToSection('testimonials')}
             >
               التقييمات
@@ -128,21 +128,21 @@ const NavbarEnhanced = () => {
           `}>
 
             {/* WhatsApp Button */}
-            <Button 
+            <Button
               variant="outline"
               size={isScrolled ? "sm" : "default"}
               className={`
                 gap-2 border-[#25D366]/30 bg-gradient-to-r from-[#25D366]/5 to-[#128C7E]/5
-                text-[#075E54] hover:bg-gradient-to-r hover:from-[#25D366] hover:to-[#128C7E] 
+                text-[#075E54] hover:bg-gradient-to-r hover:from-[#25D366] hover:to-[#128C7E]
                 hover:text-white hover:border-[#25D366]
-                transition-all duration-300 hover-lift hidden sm:inline-flex shadow-sm hover:shadow-lg
+                transition-all duration-300 hover-lift hidden sm:inline-flex shadow-sm hover:shadow-lg relative z-10
                 ${isScrolled ? 'px-3' : 'px-4'}
               `}
               onClick={handleWhatsAppClick}
             >
-              <img 
-                src="/whatsapp-logo.svg" 
-                alt="WhatsApp" 
+              <img
+                src="/whatsapp-logo.svg"
+                alt="WhatsApp"
                 className={`${isScrolled ? "w-4 h-4" : "w-5 h-5"} transition-all`}
               />
               <span className={isScrolled ? "hidden lg:inline" : ""}>
@@ -151,13 +151,13 @@ const NavbarEnhanced = () => {
             </Button>
 
             {/* Join Button */}
-            <Button 
+            <Button
               size={isScrolled ? "sm" : "default"}
               className={`
-                gap-2 bg-gradient-to-r from-primary to-primary-light 
+                gap-2 bg-gradient-to-r from-primary to-primary-light
                 hover:from-primary-dark hover:to-primary
                 text-white hover-lift shadow-lg hover:shadow-xl
-                transition-all
+                transition-all relative z-10
                 ${isScrolled ? 'px-3' : 'px-4'}
               `}
               onClick={handleFreelancerJoin}

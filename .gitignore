@@ -33,7 +33,3 @@ dist-ssr
 
 # Sensitive configuration files
 whatsapp-bot/.env
-whatsapp
-
-# Exclude WhatsApp bot directory
-whatsapp-bot/

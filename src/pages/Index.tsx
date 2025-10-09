@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import NavbarEnhanced from '@/components/landing/NavbarEnhanced';
 import HeroEnhanced from '@/components/landing/HeroEnhanced';
 import StatisticsSection from '@/components/landing/StatisticsSection';
@@ -7,10 +8,8 @@ import HowItWorksEnhanced from '@/components/landing/HowItWorksEnhanced';
 import PricingSection from '@/components/landing/PricingSection';
 import TestimonialsSection from '@/components/landing/TestimonialsSection';
 import PartnersSection from '@/components/landing/PartnersSection';
-import FeaturedGrid from '@/components/landing/FeaturedGrid';
 import FAQSection from '@/components/landing/FAQSection';
-import CTASection from '@/components/landing/CTASection';
-import FooterEnhanced from '@/components/landing/FooterEnhanced';
+import Footer from '@/components/landing/Footer';
 
 const Index = () => {
   useEffect(() => {
@@ -49,30 +48,109 @@ const Index = () => {
     };
   }, []);
 
+  const { scrollYProgress } = useScroll();
+  const scaleProgress = useTransform(scrollYProgress, [0, 1], [0.8, 1]);
+  const opacityProgress = useTransform(scrollYProgress, [0, 0.2], [0.6, 1]);
+
+  // Scroll reveal animation configuration
+  const fadeInUp = {
+    hidden: { opacity: 0, y: 60 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.6,
+        ease: [0.22, 1, 0.36, 1]
+      }
+    }
+  };
+
+  const scaleIn = {
+    hidden: { opacity: 0, scale: 0.95 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: {
+        duration: 0.7,
+        ease: [0.22, 1, 0.36, 1]
+      }
+    }
+  };
+
   return (
     <div className="font-tajawal">
       <NavbarEnhanced />
       <main className="overflow-hidden">
         <HeroEnhanced />
-        <div id="statistics">
+        
+        <motion.div 
+          id="statistics"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+          variants={fadeInUp}
+        >
           <StatisticsSection />
-        </div>
-        <div id="features">
+        </motion.div>
+
+        <motion.div 
+          id="features"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          variants={scaleIn}
+        >
           <FeaturesEnhanced />
-        </div>
-        <HowItWorksEnhanced />
-        <div id="pricing">
+        </motion.div>
+
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          variants={fadeInUp}
+        >
+          <HowItWorksEnhanced />
+        </motion.div>
+
+        <motion.div 
+          id="pricing"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          variants={scaleIn}
+        >
           <PricingSection />
-        </div>
-        <div id="testimonials">
+        </motion.div>
+
+        <motion.div 
+          id="testimonials"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          variants={fadeInUp}
+        >
           <TestimonialsSection />
-        </div>
-        <PartnersSection />
-        <FeaturedGrid />
-        <FAQSection />
-        <CTASection />
+        </motion.div>
+
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+          variants={scaleIn}
+        >
+          <PartnersSection />
+        </motion.div>
+
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+          variants={scaleIn}
+        >
+          <FAQSection />
+        </motion.div>
       </main>
-      <FooterEnhanced />
+      <Footer />
     </div>
   );
 };

@@ -255,7 +255,7 @@ const VerificationPending: React.FC<VerificationPendingProps> = ({
                 <div className="flex flex-wrap gap-2 text-xs">
                   <Badge variant="outline" className="bg-background/50">
                     <Mail className="w-3 h-3 ml-1" />
-                    support@khadum.sa
+                    help@khadum.app
                   </Badge>
                   <Badge variant="outline" className="bg-background/50">
                     <Phone className="w-3 h-3 ml-1" />

@@ -109,7 +109,7 @@ const AdminLogin = () => {
                   <Input
                     id="admin-email"
                     type="email"
-                    placeholder="admin@khadum.sa"
+                    placeholder="admin@khadum.app"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required

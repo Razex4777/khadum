@@ -132,7 +132,7 @@ const Footer = () => {
                 <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
                   <Mail className="w-4 h-4" />
                 </div>
-                <span className="font-medium">support@khadoom.sa</span>
+                <span className="font-medium">help@khadum.app</span>
               </li>
               <li className="flex items-center gap-3 text-white/70">
                 <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">

@@ -70,7 +70,7 @@ serve(async (req) => {
           to: [email],
           subject: emailContent.subject,
           html: emailContent.html,
-          reply_to: 'support@khadum.app'
+          reply_to: 'help@khadum.app'
         }),
       })
       return response
@@ -390,7 +390,7 @@ function generateEmailContent(full_name: string, status: 'approved' | 'rejected'
             
             <div style="margin: 1rem 0;">
                 📞 <strong>الواتساب:</strong> <a href="https://wa.me/966511809878" style="color: #059669;">+966511809878</a><br>
-                📧 <strong>البريد الإلكتروني:</strong> <a href="mailto:support@khadum.sa" style="color: #059669;">support@khadum.sa</a>
+                📧 <strong>البريد الإلكتروني:</strong> <a href="mailto:help@khadum.app" style="color: #059669;">help@khadum.app</a>
             </div>
         </div>
         

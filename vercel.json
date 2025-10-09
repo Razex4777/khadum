@@ -4,9 +4,54 @@
   "outputDirectory": "dist",
   "installCommand": "npm install",
   "framework": null,
+  "public": true,
   "routes": [
-    { "src": "/assets/(.*)", "dest": "/assets/$1" },
-    { "src": "/(.*)", "dest": "/index.html" }
+    {
+      "src": "/hero/(.*)",
+      "dest": "/hero/$1",
+      "headers": {
+        "Cache-Control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "src": "/avatars/(.*)",
+      "dest": "/avatars/$1",
+      "headers": {
+        "Cache-Control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "src": "/assets/(.*)",
+      "dest": "/assets/$1",
+      "headers": {
+        "Cache-Control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "src": "/robots.txt",
+      "dest": "/robots.txt",
+      "headers": {
+        "Content-Type": "text/plain"
+      }
+    },
+    {
+      "src": "/sitemap.xml",
+      "dest": "/sitemap.xml",
+      "headers": {
+        "Content-Type": "application/xml"
+      }
+    },
+    {
+      "src": "/whatsapp-logo.svg",
+      "dest": "/whatsapp-logo.svg",
+      "headers": {
+        "Content-Type": "image/svg+xml"
+      }
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
   ]
 }
 

@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { MessageCircle, UserPlus, Shield, Mail, Phone, MapPin, Sparkles, Heart } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { MessageCircle, UserPlus, Shield, Mail, Phone, MapPin, Send, Heart } from "lucide-react";
 import { motion } from "framer-motion";
 
 const Footer = () => {
@@ -16,65 +17,91 @@ const Footer = () => {
     navigate('/admin-login');
   };
 
-  return (
-    <footer className="relative bg-gradient-to-br from-[hsl(var(--primary-dark))] via-[hsl(var(--primary))] to-[hsl(var(--primary-light))] text-white mt-24 overflow-hidden">
-      {/* Decorative Background Elements */}
-      <div className="absolute inset-0 overflow-hidden opacity-20">
-        <div className="absolute top-10 right-10 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-10 left-10 w-96 h-96 bg-[#25D366]/10 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[#d4af37]/10 rounded-full blur-3xl" />
-      </div>
+  const quickLinks = [
+    { text: 'كيف يعمل خدوم؟', action: handleWhatsAppClick },
+    { text: 'الأسعار والعمولات', action: () => navigate('/') },
+    { text: 'الأسئلة الشائعة', action: () => navigate('/') },
+    { text: 'مركز المساعدة', action: handleWhatsAppClick }
+  ];
 
-      <div className="container py-16 relative">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+  const legalLinks = [
+    { text: 'دخول المدير', action: handleAdminClick },
+    { text: 'سياسة الخصوصية', action: () => {} },
+    { text: 'شروط الخدمة', action: () => {} },
+    { text: 'سياسة الاسترداد', action: () => {} }
+  ];
+
+  return (
+    <footer className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white overflow-hidden">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" />
+      
+      {/* Decorative Gradient Blobs */}
+      <div className="absolute top-0 right-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-secondary/10 rounded-full blur-3xl" />
+
+      <div className="container relative z-10 py-16 md:py-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12">
           
-          {/* Brand Section */}
+          {/* Brand Section with Newsletter */}
           <motion.div 
-            className="space-y-6"
+            className="lg:col-span-2 space-y-6"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
             <div className="flex items-center gap-3">
-              <motion.div 
-                className="h-4 w-4 rounded-full bg-white shadow-[0_0_20px_rgba(255,255,255,0.9)]"
-                animate={{
-                  scale: [1, 1.2, 1],
-                  opacity: [1, 0.8, 1],
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-              />
+              <div className="h-3 w-3 rounded-full bg-primary shadow-lg shadow-primary/50" />
               <span className="font-extrabold tracking-tight text-2xl">خدوم</span>
             </div>
-            <p className="text-white/80 leading-relaxed text-base">
+            
+            <p className="text-gray-300 leading-relaxed max-w-md">
               منصة ذكية تربط العملاء بالمستقلين عبر واتساب مع دفع آمن وخدمة سريعة على مدار الساعة.
             </p>
-            <div className="flex gap-3">
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button 
-                  size="sm" 
-                  className="gap-2 bg-white/20 hover:bg-white/30 border border-white/30 text-white backdrop-blur-sm"
-                  onClick={handleWhatsAppClick}
-                >
-                  <img src="/whatsapp-logo.svg" alt="WhatsApp" className="w-4 h-4 brightness-0 invert" />
-                  واتساب
+
+            {/* Newsletter */}
+            <div className="space-y-3">
+              <h4 className="font-bold text-lg">اشترك في نشرتنا البريدية</h4>
+              <div className="flex gap-2">
+              <form
+                className="flex gap-2"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  // TODO: hook up to backend/newsletter service
+                }}
+              >
+                <Input
+                  required
+                  type="email"
+                  placeholder="بريدك الإلكتروني"
+                  className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-primary focus:ring-primary"
+                />
+                <Button type="submit" className="bg-primary hover:bg-primary-dark px-4">
+                  <Send className="w-4 h-4" />
                 </Button>
-              </motion.div>
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button 
-                  size="sm" 
-                  className="gap-2 bg-white text-[hsl(var(--primary))] hover:bg-white/90"
-                  onClick={() => navigate('/authentication/register')}
-                >
-                  <UserPlus className="w-4 h-4" />
-                  انضم الآن
-                </Button>
-              </motion.div>
+              </form>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex flex-wrap gap-3 pt-2">
+              <Button 
+                size="sm" 
+                variant="outline"
+                className="gap-2 bg-white/10 hover:bg-white/20 border-white/20 text-white backdrop-blur-sm"
+                onClick={handleWhatsAppClick}
+              >
+                <img src="/whatsapp-logo.svg" alt="WhatsApp" className="w-4 h-4 brightness-0 invert" />
+                واتساب
+              </Button>
+              <Button 
+                size="sm" 
+                className="gap-2 bg-primary hover:bg-primary-dark"
+                onClick={() => navigate('/authentication/register')}
+              >
+                <UserPlus className="w-4 h-4" />
+                انضم الآن
+              </Button>
             </div>
           </motion.div>
 
@@ -86,21 +113,13 @@ const Footer = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            <h4 className="font-bold text-lg flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-[#d4af37]" />
-              روابط سريعة
-            </h4>
+            <h4 className="font-bold text-lg mb-4">روابط سريعة</h4>
             <ul className="space-y-3">
-              {[
-                { text: 'كيف يعمل خدوم؟', action: handleWhatsAppClick },
-                { text: 'الأسعار والعمولات', action: () => navigate('/') },
-                { text: 'الأسئلة الشائعة', action: () => navigate('/') },
-                { text: 'مركز المساعدة', action: handleWhatsAppClick },
-              ].map((link, i) => (
+              {quickLinks.map((link, i) => (
                 <li key={i}>
                   <button 
                     onClick={link.action}
-                    className="text-white/70 hover:text-white transition-all duration-300 hover:translate-x-2 inline-block"
+                    className="text-gray-300 hover:text-white transition-colors duration-300 hover:translate-x-1 inline-block"
                   >
                     {link.text}
                   </button>
@@ -109,83 +128,70 @@ const Footer = () => {
             </ul>
           </motion.div>
 
-          {/* Contact Info */}
+          {/* Contact & Legal */}
           <motion.div 
-            className="space-y-4"
+            className="space-y-6"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <h4 className="font-bold text-lg flex items-center gap-2">
-              <MessageCircle className="w-5 h-5 text-[#25D366]" />
-              تواصل معنا
-            </h4>
-            <ul className="space-y-3">
-              <li className="flex items-center gap-3 text-white/70 hover:text-white transition-colors">
-                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
-                  <Phone className="w-4 h-4" />
-                </div>
-                <span dir="ltr" className="font-medium">+966511809878</span>
-              </li>
-              <li className="flex items-center gap-3 text-white/70 hover:text-white transition-colors">
-                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
-                  <Mail className="w-4 h-4" />
-                </div>
-                <span className="font-medium">help@khadum.app</span>
-              </li>
-              <li className="flex items-center gap-3 text-white/70">
-                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
-                  <MapPin className="w-4 h-4" />
-                </div>
-                <span className="font-medium">الرياض، السعودية</span>
-              </li>
-            </ul>
-          </motion.div>
-
-          {/* Admin & Legal */}
-          <motion.div 
-            className="space-y-4"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-          >
-            <h4 className="font-bold text-lg flex items-center gap-2">
-              <Shield className="w-5 h-5 text-white" />
-              قانوني وإداري
-            </h4>
-            <ul className="space-y-3">
-              <li>
-                <button 
-                  onClick={handleAdminClick}
-                  className="text-white/70 hover:text-white transition-all duration-300 hover:translate-x-2 inline-block"
-                >
-                  دخول المدير
-                </button>
-              </li>
-              {['سياسة الخصوصية', 'شروط الخدمة', 'سياسة الاسترداد', 'اتفاقية المستخدم'].map((text, i) => (
-                <li key={i}>
-                  <button className="text-white/70 hover:text-white transition-all duration-300 hover:translate-x-2 inline-block">
-                    {text}
-                  </button>
+            {/* Contact */}
+            <div className="space-y-4">
+              <h4 className="font-bold text-lg">تواصل معنا</h4>
+              <ul className="space-y-3">
+                <li className="flex items-center gap-3 text-gray-300 text-sm">
+                  <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
+                    <Phone className="w-4 h-4" />
+                  </div>
+                  <span dir="ltr">+966511809878</span>
                 </li>
+                <li className="flex items-center gap-3 text-gray-300 text-sm">
+                  <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
+                    <Mail className="w-4 h-4" />
+                  </div>
+                  <span>help@khadum.app</span>
+                </li>
+                <li className="flex items-center gap-3 text-gray-300 text-sm">
+                  <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
+                    <MapPin className="w-4 h-4" />
+                  </div>
+                  <span>الرياض، السعودية</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Legal Links */}
+            <div className="space-y-3 pt-4 border-t border-white/10">
+              {legalLinks.slice(0, 2).map((link, i) => (
+                <button 
+                  key={i}
+                  onClick={link.action}
+                  className="block text-sm text-gray-400 hover:text-white transition-colors duration-300"
+                >
+                  {link.text}
+                </button>
               ))}
-            </ul>
+            </div>
           </motion.div>
         </div>
 
-        {/* Bottom Bar with Enhanced Design */}
+        {/* Bottom Bar */}
         <motion.div 
-          className="border-t border-white/20 mt-12 pt-8"
+          className="border-t border-white/10 mt-12 pt-8"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.4 }}
         >
-          <div className="text-center">
-            <div className="text-white/90 font-medium text-sm md:text-base">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="text-sm text-gray-400 text-center md:text-right">
               © 2025 SALMAN ABDUH ALI ALASMARI — Sales Promotion and Management. All Rights Reserved.
+            </div>
+            <div className="flex items-center gap-2 text-sm text-gray-400">
+              <span>صنع بـ</span>
+              <Heart className="w-4 h-4 text-red-500 fill-red-500" />
+              <span>في السعودية</span>
             </div>
           </div>
         </motion.div>
